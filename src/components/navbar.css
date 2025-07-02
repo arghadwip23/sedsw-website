@@ -1,0 +1,122 @@
+.menu-bar, .menu-overlay-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    padding: 2em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1;
+    font-size: 24px;
+    font-weight: 100;
+}
+
+.menu-bar a, .menu-open p {
+    color: #fff;
+    cursor: pointer;
+}
+
+.menu-close p {
+    color: #fff;
+    cursor: pointer;
+}
+
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    padding: 2em;
+    background: transparent;
+    backdrop-filter: blur(32px) brightness(60%);
+    z-index: 2;
+    display: flex;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%);
+}
+
+.menu-close-icon {
+    flex: 2;
+    display: flex;
+    align-items: flex-end;
+    cursor: pointer;
+}
+
+.menu-copy {
+    flex: 4;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-top: 2em;
+}
+
+.menu-preview {
+    flex: 4;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+.menu-close-icon p {
+    font-size: 100px;
+    -webkit-text-stroke: 5px #00000000;
+    line-height: 70%;  
+}
+
+.menu-link-item {
+    width: max-content;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+.menu-link-item-holder {
+    position: relative;
+}
+
+.menu-link-item-holder a {
+    color: #fff;
+    font-size: 80px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 85%;
+}
+
+.menu-info {
+    display: flex;
+}
+
+.menu-info-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.menu-links {
+    padding-top: 10em;
+}
+
+@media (width<900px) {
+    .menu-link-item-holder a {
+        color: #fff;
+        font-size: 80px;
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 85%;
+    }
+
+    .menu-overlay {
+        flex-direction: column;
+    }
+
+    .menu-overlay-bar {
+        padding: 1em;
+    }
+
+    .menu-bar {
+        padding: 1em;
+    }
+    .menu-links {
+    padding-top: 0;
+}
+}

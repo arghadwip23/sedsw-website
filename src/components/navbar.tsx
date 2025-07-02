@@ -1,61 +1,130 @@
 "use client"
 
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import "./navbar.css";
+
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import DecryptedText from '../../TextAnimations/DecryptedText/DecryptedText';
+
+const menuLinks = [
+    { path: "/", label: "Home" },
+    { path: "/about", label: "About" },
+    { path: "/events", label: "Events" },
+    { path: "/projects", label: "Projects" },
+    { path: "/gallery", label: "Gallery" },
+    { path: "/join", label: "Join Us" },
+];
 
 export function Navbar() {
-    const [menuOpen, setMenuOpen] = useState(false);
+    const container = useRef<HTMLDivElement | null>(null);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const tl = useRef<gsap.core.Timeline | null>(null);
+
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
+
+    useGSAP(
+        () => {
+            gsap.set(".menu-link-item-holder", { y: 75 });
+
+            tl.current = gsap.timeline({ paused: true })
+                .to(".menu-overlay", {
+                    duration: 1.25,
+                    clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+                    ease: "power4.inOut",
+                })
+                .to(".menu-link-item-holder", {
+                    y: 0,
+                    duration: 1,
+                    stagger: 0.1,
+                    ease: "power4.inOut",
+                    delay: -0.75,
+                });
+        },
+        { scope: container }
+    );
+
+    useEffect(() => {
+        if (tl.current) {
+            if (isMenuOpen) {
+                tl.current.play();
+            } else {
+                tl.current.reverse();
+            }
+        }
+    }, [isMenuOpen]);
+
+    // Close menu on Escape key
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                if (isMenuOpen) {
+                    setIsMenuOpen(false);
+                } else {
+                    setIsMenuOpen(true);
+                }
+
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [isMenuOpen]);
 
     return (
-        <nav className="fixed top-0 left-0 w-full z-50">
-            <div className="flex justify-between items-center w-full px-6 md:px-36 py-4 mx-auto">
-                <Link href="/">
-                    <h1 className="font-bold text-xl text-white">Antariksh</h1>
-                </Link>
-                {/* Desktop menu */}
-                <div className="hidden md:flex gap-6">
-                    <Link href="/about" className="text-white hover:underline">About</Link>
-                    <Link href="/events" className="text-white hover:underline">Events</Link>
-                    <Link href="/projects" className="text-white hover:underline">Projects</Link>
-                    <Link href="/gallery" className="text-white hover:underline">Gallery</Link>
-                    <Link href="/join" className="text-white hover:underline">Join / Contact Us</Link>
+        <div className="menu-container z-50" ref={container}>
+            <div className="menu-bar">
+                <div className="menu-logo">
+                    <Link href={"/"}>Antariksh</Link>
                 </div>
-                {/* Hamburger */}
-                <button
-                    className="md:hidden flex flex-col justify-center items-center w-8 h-8 relative z-30"
-                    aria-label="Toggle menu"
-                    onClick={() => setMenuOpen((open) => !open)}
-                >
-                    <span
-                        className={`block h-0.5 w-6 bg-white transition-all duration-300 rounded-sm ${menuOpen ? 'rotate-45 translate-y-2' : ''}`}
-                    />
-                    <span
-                        className={`block h-0.5 w-6 bg-white transition-all duration-300 rounded-sm my-1 ${menuOpen ? 'opacity-0' : ''}`}
-                    />
-                    <span
-                        className={`block h-0.5 w-6 bg-white transition-all duration-300 rounded-sm ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`}
-                    />
-                </button>
-                {/* Mobile menu */}
-                <div
-                    className={`fixed inset-0 bg-black/30 backdrop-blur transition-transform duration-300 z-20 flex flex-col items-center justify-center gap-8 md:hidden ${menuOpen ? 'translate-x-0' : 'translate-x-full'
-                        }`}
-                >
-                    <Link href="/about" className="text-2xl" onClick={() => setMenuOpen(false)}>About</Link>
-                    <Link href="/events" className="text-2xl" onClick={() => setMenuOpen(false)}>Events</Link>
-                    <Link href="/projects" className="text-2xl" onClick={() => setMenuOpen(false)}>Projects</Link>
-                    <Link href="/gallery" className="text-2xl" onClick={() => setMenuOpen(false)}>Gallery</Link>
-                    <Link href="/join" className="text-2xl" onClick={() => setMenuOpen(false)}>Join / Contact Us</Link>
+                <div className="menu-open" onClick={toggleMenu}>
+                    <p>Menu</p>
                 </div>
-                {/* Overlay when menu is open */}
-                {menuOpen && (
-                    <div
-                        className="fixed inset-0 z-10 md:hidden"
-                        onClick={() => setMenuOpen(false)}
-                        aria-hidden="true"
-                    />
-                )}
             </div>
-        </nav>
+            <div className="menu-overlay">
+                <div className="menu-overlay-bar">
+                    <Link href={"/"}>Antariksh</Link>
+                    <div className="menu-logo"></div>
+                    <div className="menu-close" onClick={toggleMenu}>
+                        <p>Close</p>
+                    </div>
+                </div>
+                <div className="menu-close-icon" onClick={toggleMenu}>
+                    <p>&#x2715;</p>
+                </div>
+                <div className="menu-copy">
+                    <div className="menu-links">
+                        {menuLinks.map((link, index) => (
+                            <div className="menu-link-item" key={index}>
+                                <div className="menu-link-item-holder" onClick={toggleMenu}>
+                                    <Link href={link.path} className="menu-link">
+                                        <DecryptedText
+                                            text={link.label}
+                                            speed={50}
+                                            maxIterations={10}
+                                            revealDirection='start'
+                                            useOriginalCharsOnly={true}
+                                        />
+                                    </Link>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="menu-info">
+                        <div className="menu-info-col">
+                            <a href='#'>Instagram &#8599;</a>
+                            <a href='#'>Medium &#8599;</a>
+                            <a href='#'>Twitter &#8599;</a>
+                        </div>
+                        <div className="menu-info-col">
+                            <p>info@antariksh.com</p>
+                            <p>VIT Chennai</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }
