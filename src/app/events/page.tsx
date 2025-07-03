@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React, { useState, useRef, useEffect, Suspense } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import SpotlightCard from "../../../Components/SpotlightCard/SpotlightCard";
 import { events } from "../../data/events";
 
