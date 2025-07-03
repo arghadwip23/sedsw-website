@@ -4,85 +4,46 @@ import Link from "next/link";
 import React, { useState, useRef, useEffect, Suspense } from "react";
 import SpotlightCard from "../../../Components/SpotlightCard/SpotlightCard";
 import { events } from "../../data/events";
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import * as THREE from "three";
-
-function MarsModel({ setProgress }: { setProgress: (p: number) => void }) {
-  const meshRef = useRef<THREE.Group>(null);
-  const [modelLoaded, setModelLoaded] = useState(false);
-
-  const gltf = useLoader(
-    GLTFLoader,
-    '/models/mars2.glb',
-    (loader) => {
-      loader.manager.onStart = () => setProgress(0);
-      loader.manager.onProgress = (_, loaded, total) => {
-        setProgress(Math.round((loaded / total) * 100));
-      };
-      loader.manager.onLoad = () => {
-        setProgress(100);
-        setModelLoaded(true);
-      };
-      loader.manager.onError = (url) => {
-        console.error('Error loading model:', url);
-      };
-    }
-  );
-
-  // Spin the model around z axis
-  useFrame(() => {
-    if (meshRef.current && modelLoaded) {
-      meshRef.current.rotation.z += 0.005;
-    }
-  });
-
-  if (!modelLoaded) return null;
-
-  return (
-    <primitive
-      ref={meshRef}
-      object={gltf.scene}
-      scale={2.5}
-      position={[0, 0, 0]}
-    />
-  );
-}
 
 export default function Events() {
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Clean up Three.js resources on unmount
+  // Loader for video progress
   useEffect(() => {
-    return () => {
-      // Force cleanup of Three.js resources
-      if (canvasRef.current) {
-        canvasRef.current.innerHTML = '';
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleProgress = () => {
+      if (video.buffered.length > 0) {
+        const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+        const duration = video.duration;
+        if (duration > 0) {
+          setProgress(Math.round((bufferedEnd / duration) * 100));
+        }
       }
     };
-  }, []);
 
-  // Hide loader when model is loaded
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (progress < 100) {
-        console.warn('Model loading timed out - falling back to static background');
-        setIsLoading(false);
-      }
-    }, 45000); // Increased timeout to 15 seconds
+    const handleCanPlay = () => {
+      setTimeout(() => setIsLoading(false), 500);
+    };
 
-    return () => clearTimeout(timer);
-  }, [progress]);
+    video.addEventListener("progress", handleProgress);
+    video.addEventListener("canplay", handleCanPlay);
+    video.addEventListener("loadeddata", handleCanPlay);
 
-  // Handle successful load
-  useEffect(() => {
-    if (progress === 100) {
-      setIsLoading(false);
+    if (video.readyState >= 3) {
+      handleCanPlay();
     }
-  }, [progress]);
+
+    return () => {
+      video.removeEventListener("progress", handleProgress);
+      video.removeEventListener("canplay", handleCanPlay);
+      video.removeEventListener("loadeddata", handleCanPlay);
+    };
+  }, []);
 
   const scrollByCards = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
@@ -145,54 +106,25 @@ export default function Events() {
               style={{ width: `${progress}%` }}
             ></div>
           </div>
-          <p className="text-white text-lg">Loading Model...</p>
+          <p className="text-white text-lg">Loading Video...</p>
           <p className="text-gray-400 text-sm mt-2">
             {progress}%
           </p>
         </div>
       )}
 
-      {/* Mars 3D Model Background with ref */}
-      <div className="w-full h-screen fixed top-0 left-0 -z-[9999]" ref={canvasRef}>
-        <Canvas
-          camera={{
-            position: [0, 0, 10],
-            fov: 45,
-            near: 0.1,
-            far: 1000
-          }}
-          gl={{
-            antialias: true,
-            powerPreference: "high-performance",
-            preserveDrawingBuffer: true // Helps with context preservation
-          }}
-          onCreated={({ gl }) => {
-            gl.getContext().canvas.addEventListener('webglcontextlost', (e) => {
-              e.preventDefault();
-              console.warn('WebGL context lost - attempting to recover');
-            }, false);
-          }}
-        >
-          <color attach="background" args={['#000000']} />
-          <ambientLight intensity={0.5} />
-          <pointLight position={[10, 10, 10]} intensity={1} />
-          <directionalLight
-            position={[5, 5, 5]}
-            intensity={2}
-            castShadow
-          />
-          <Suspense fallback={null}>
-            <MarsModel setProgress={setProgress} />
-          </Suspense>
-        </Canvas>
+      {/* Mars Video Background */}
+      <div className="w-full h-screen fixed top-0 left-0 -z-[9999]">
+        <video
+          ref={videoRef}
+          src="/videos/mars.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover"
+        />
       </div>
-
-      {/* Fallback in case model fails to load */}
-      {!isLoading && progress < 100 && (
-        <div className="absolute inset-0 -z-[9998] bg-black flex items-center justify-center">
-          <p className="text-white">Could not load 3D model</p>
-        </div>
-      )}
 
       <div className="flex flex-col z-10 pt-16">
         <h1 className="text-3xl font-bold text-white md:mb-16 md:self-end md:pr-36 md:text-right text-center mb-8">
@@ -250,7 +182,7 @@ export default function Events() {
             <button
               aria-label="Scroll left"
               className={`p-2 transition
-                ${canScrollLeft ? "transparent backdrop-blur-2xl text-white hover:bg-white hover:text-black" : "bg-black/20 text-gray-400 cursor-not-allowed"}
+                ${canScrollLeft ? "transparent text-white hover:bg-white hover:text-black" : "text-gray-400 cursor-not-allowed"}
               `}
               onClick={() => scrollByCards("left")}
               style={{ pointerEvents: canScrollLeft && !isLoading ? "auto" : "none" }}
@@ -261,7 +193,7 @@ export default function Events() {
             <button
               aria-label="Scroll right"
               className={`p-2 transition
-                ${canScrollRight ? "transparent backdrop-blur-2xl text-white hover:bg-white hover:text-black" : "bg-black/20 text-gray-400 cursor-not-allowed"}
+                ${canScrollRight ? "transparent text-white hover:bg-white hover:text-black" : " text-gray-400 cursor-not-allowed"}
               `}
               onClick={() => scrollByCards("right")}
               style={{ pointerEvents: canScrollRight && !isLoading ? "auto" : "none" }}
@@ -276,7 +208,7 @@ export default function Events() {
       <Link
         href="/projects"
         className="fixed bottom-8 right-8 z-30 px-6 py-3 bg-white text-black font-semibold shadow-lg transition-all duration-300 ease-out
-          hover:bg-black hover:text-white hover:scale-105 group flex items-center gap-2 rounded-full"
+          hover:bg-black hover:text-white hover:scale-105 group flex items-center gap-2"
       >
         <span>Next Page</span>
         <span className="transition-transform duration-300 group-hover:translate-x-1">&#8594;</span>
