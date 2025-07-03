@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+// import Link from "next/link";
 import React, { useState, useRef, useEffect } from "react";
 
 export default function About() {
