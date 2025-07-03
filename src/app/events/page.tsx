@@ -1,48 +1,88 @@
 "use client";
 
 import Link from "next/link";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, Suspense } from "react";
 import SpotlightCard from "../../../Components/SpotlightCard/SpotlightCard";
 import { events } from "../../data/events";
+import { Canvas, useFrame, useLoader } from "@react-three/fiber";
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import * as THREE from "three";
+
+function MarsModel({ setProgress }: { setProgress: (p: number) => void }) {
+  const meshRef = useRef<THREE.Group>(null);
+  const [modelLoaded, setModelLoaded] = useState(false);
+
+  const gltf = useLoader(
+    GLTFLoader,
+    '/models/mars2.glb',
+    (loader) => {
+      loader.manager.onStart = () => setProgress(0);
+      loader.manager.onProgress = (_, loaded, total) => {
+        setProgress(Math.round((loaded / total) * 100));
+      };
+      loader.manager.onLoad = () => {
+        setProgress(100);
+        setModelLoaded(true);
+      };
+      loader.manager.onError = (url) => {
+        console.error('Error loading model:', url);
+      };
+    }
+  );
+
+  // Spin the model around z axis
+  useFrame(() => {
+    if (meshRef.current && modelLoaded) {
+      meshRef.current.rotation.z += 0.005;
+    }
+  });
+
+  if (!modelLoaded) return null;
+
+  return (
+    <primitive
+      ref={meshRef}
+      object={gltf.scene}
+      scale={2.5}
+      position={[0, 0, 0]}
+    />
+  );
+}
 
 export default function Events() {
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
 
+  // Clean up Three.js resources on unmount
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const handleProgress = () => {
-      if (video.buffered.length > 0) {
-        const bufferedEnd = video.buffered.end(video.buffered.length - 1);
-        const duration = video.duration;
-        if (duration > 0) {
-          setProgress((bufferedEnd / duration) * 100);
-        }
+    return () => {
+      // Force cleanup of Three.js resources
+      if (canvasRef.current) {
+        canvasRef.current.innerHTML = '';
       }
     };
-
-    const handleCanPlay = () => {
-      setTimeout(() => setIsLoading(false), 500);
-    };
-
-    video.addEventListener("progress", handleProgress);
-    video.addEventListener("canplay", handleCanPlay);
-    video.addEventListener("loadeddata", handleCanPlay);
-
-    if (video.readyState >= 3) {
-      handleCanPlay();
-    }
-
-    return () => {
-      video.removeEventListener("progress", handleProgress);
-      video.removeEventListener("canplay", handleCanPlay);
-      video.removeEventListener("loadeddata", handleCanPlay);
-    };
   }, []);
+
+  // Hide loader when model is loaded
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (progress < 100) {
+        console.warn('Model loading timed out - falling back to static background');
+        setIsLoading(false);
+      }
+    }, 45000); // Increased timeout to 15 seconds
+
+    return () => clearTimeout(timer);
+  }, [progress]);
+
+  // Handle successful load
+  useEffect(() => {
+    if (progress === 100) {
+      setIsLoading(false);
+    }
+  }, [progress]);
 
   const scrollByCards = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
@@ -70,7 +110,6 @@ export default function Events() {
   };
 
   const [scrollIndicator, setScrollIndicator] = useState({ width: 0, left: 0 });
-
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
@@ -106,26 +145,59 @@ export default function Events() {
               style={{ width: `${progress}%` }}
             ></div>
           </div>
-          <p className="text-white text-lg">Loading...</p>
+          <p className="text-white text-lg">Loading Model...</p>
           <p className="text-gray-400 text-sm mt-2">
-            {Math.round(progress)}%
+            {progress}%
           </p>
         </div>
       )}
 
-      <div className="w-full h-screen fixed top-0 left-0 -z-[9999]">
-        <video
-          ref={videoRef}
-          src="/videos/mars.webm"
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full h-full object-cover"
-        />
+      {/* Mars 3D Model Background with ref */}
+      <div className="w-full h-screen fixed top-0 left-0 -z-[9999]" ref={canvasRef}>
+        <Canvas
+          camera={{
+            position: [0, 0, 10],
+            fov: 45,
+            near: 0.1,
+            far: 1000
+          }}
+          gl={{
+            antialias: true,
+            powerPreference: "high-performance",
+            preserveDrawingBuffer: true // Helps with context preservation
+          }}
+          onCreated={({ gl }) => {
+            gl.getContext().canvas.addEventListener('webglcontextlost', (e) => {
+              e.preventDefault();
+              console.warn('WebGL context lost - attempting to recover');
+            }, false);
+          }}
+        >
+          <color attach="background" args={['#000000']} />
+          <ambientLight intensity={0.5} />
+          <pointLight position={[10, 10, 10]} intensity={1} />
+          <directionalLight
+            position={[5, 5, 5]}
+            intensity={2}
+            castShadow
+          />
+          <Suspense fallback={null}>
+            <MarsModel setProgress={setProgress} />
+          </Suspense>
+        </Canvas>
       </div>
+
+      {/* Fallback in case model fails to load */}
+      {!isLoading && progress < 100 && (
+        <div className="absolute inset-0 -z-[9998] bg-black flex items-center justify-center">
+          <p className="text-white">Could not load 3D model</p>
+        </div>
+      )}
+
       <div className="flex flex-col z-10 pt-16">
-        <h1 className="text-3xl font-bold text-white md:mb-16 md:self-end md:pr-36 md:text-right text-center mb-8">Our Events</h1>
+        <h1 className="text-3xl font-bold text-white md:mb-16 md:self-end md:pr-36 md:text-right text-center mb-8">
+          Our Events
+        </h1>
         <div className="relative w-full">
           {/* Card List */}
           <div
@@ -164,6 +236,7 @@ export default function Events() {
             ))}
             <div style={{ minWidth: 24, maxWidth: 24, pointerEvents: "none" }} aria-hidden="true" />
           </div>
+          {/* Thin scroll indicator */}
           <div className="absolute left-1/4 right-1/4 bottom-14 h-1 bg-white/10 rounded-full pointer-events-none overflow-hidden">
             <div
               className="h-full bg-white/40 rounded-full transition-all duration-200 absolute"
@@ -203,7 +276,7 @@ export default function Events() {
       <Link
         href="/projects"
         className="fixed bottom-8 right-8 z-30 px-6 py-3 bg-white text-black font-semibold shadow-lg transition-all duration-300 ease-out
-          hover:bg-black hover:text-white hover:scale-105 group flex items-center gap-2"
+          hover:bg-black hover:text-white hover:scale-105 group flex items-center gap-2 rounded-full"
       >
         <span>Next Page</span>
         <span className="transition-transform duration-300 group-hover:translate-x-1">&#8594;</span>
