@@ -60,7 +60,7 @@ export default function Home() {
         </div>
       )}
 
-      <div className="w-full h-screen fixed top-0 left-0 -z-[9999]">
+      <div className="w-full h-screen fixed top-20 left-0 -z-[9999]">
         <video
           ref={videoRef}
           src="/videos/Earthlow.mp4"
