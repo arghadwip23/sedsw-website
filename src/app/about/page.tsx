@@ -15,7 +15,7 @@ import { OrbitControls } from "@react-three/drei";
 // import { useFrame } from "@react-three/fiber";
 // import { Moon } from "@/components/Moon2";
 // import * as THREE from "three";
-export function MoonScene() {
+  function MoonScene() {
   const ref = useRef<THREE.Group>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [lastMouse, setLastMouse] = useState({ x: 0, y: 0 });
