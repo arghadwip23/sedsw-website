@@ -2,13 +2,13 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import * as THREE from "three";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import dynamic from "next/dynamic";
+//import dynamic from "next/dynamic";
 
 // 🌕 Import your converted moon model
  import {Moon} from "@/components/Moon2"; // adjust path as needed
-import { div } from "framer-motion/client";
+//import { div } from "framer-motion/client";
 
 
 // import { useRef, useState, useEffect } from "react";
