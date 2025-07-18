@@ -74,7 +74,7 @@ export function Navbar() {
     }, [isMenuOpen]);
 
     return (
-        <div className="menu-container z-50" ref={container}>
+        <div className="menu-container z-50 lg:hidden" ref={container}>
             <div className="menu-bar">
                 <div className="menu-logo">
                     <Link href={"/"}>Antariksh</Link>
