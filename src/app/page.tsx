@@ -45,7 +45,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="w-full h-screen flex flex-col justify-center relative">
+    <div className="w-full h-screen flex flex-col justify-center relative ">
       {/* Loading overlay */}
       {isLoading && (
         <div className="absolute inset-0 z-50 bg-black flex flex-col items-center justify-center">

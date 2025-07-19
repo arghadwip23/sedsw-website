@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
+
 //import dynamic from "next/dynamic";
 
 // 🌕 Import your converted moon model
@@ -86,22 +87,60 @@ export default function About() {
 
   return (
     
-    <div className="w-full h-screen flex flex-col justify-center relative">
-      <div className=" absolute top-30  p-4 lg:pl-10">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu turpis molestie, dictum est a, mattis tellus. Sed dignissim, metus nec fringilla accumsan, risus sem sollicitudin lacus, ut interdum tellus elit sed risus. Maecenas eget condimentum velit,
+    <div className="w-full h-screen flex flex-col justify-center relative bg-black -z-[10]">
+      <div className=" absolute top-20 md:top-40 lg:top-10   px-2 lg:pl-10 lg:flex gap-20 justify-between items-center ">
+       <div>
+        <p className="lg:pr-20 lg:w-[70%]"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu turpis molestie, dictum est a, mattis tellus. Sed dignissim, metu nec fringilla accumsan, risus sem sollicitudin lacus, ut interdum tellus elit sed risus. Maecenas eget condimentum velit,
 sit amet feugiat lectus. Class aptent taciti sociosqu ad litora 
 torquent per conubia nostra, per inceptos himenaeos.
 Praesent auctor purus luctus enim egestas,
-ac scelerisque ante
+ac scelerisque ante</p>
+       </div>
+<div className="flex justify-end mt-20 lg:mt-0 ">
+  <div className="text-left">
+    <h2 className="font-semibold text-3xl tracking-wider">About&nbsp;Us</h2>
+    
+    <table className="table-fixed w-[300px] mt-4  border-separate border-spacing-y-4">
+      <tbody>
+        <tr>
+          <td className="p-2"><img src="./aboutHome.svg" alt="Home" /></td>
+          <td>2021-20XX</td>
+        </tr>
+        <tr>
+          <td className="p-2"><img src="./aboutGroup.svg" alt="Group" /></td>
+          <td>200+ members</td>
+        </tr>
+        <tr>
+          <td className="p-2"><img src="./aboutEvents.svg" alt="Events" /></td>
+          <td>60+ events</td>
+        </tr>
+        <tr>
+          <td className="p-2"><img src="./aboutLocation.svg" alt="Location" /></td>
+          <td>VIT Chennai</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
       </div>
-      <div className="w-full h-screen fixed top-0 left-0 -z-[9999]">
+      <div className=" w-full h-[50vh] lg:w-full lg:h-screen fixed bg-black  bottom-0  lg:top-0 left-0 -z-[9]">
         {isClient && (
           <Canvas
-            camera={{ position: [0, 0, 5], fov: 45 }}
+            camera={{ position: [0, 0, 5.3], fov: 45 }}
             gl={{ powerPreference: "high-performance", antialias: true }}
-          >
-            <ambientLight intensity={0.8} />
-            <directionalLight intensity={3} position={[2, 3, -2]} />
+           className="bg-black">
+            <ambientLight intensity={0.5} />
+            <directionalLight intensity={5} position={[0, 10, -10]} />
+             <pointLight
+    position={[0, 10, -50]} // behind the moon
+    intensity={500}
+    color={"#fffbe0"}
+    distance={100}
+    decay={2}
+    castShadow
+  />
+            
             <MoonScene />
             <OrbitControls enableZoom={false} />
           </Canvas>
