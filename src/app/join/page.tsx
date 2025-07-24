@@ -4,6 +4,7 @@ import React, { useRef, useEffect } from "react";
 import * as THREE from "three";
 import BlurText from "../../../TextAnimations/BlurText/BlurText";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import AnimatedContent from "../../../Animations/AnimatedContent/AnimatedContent";
 
 const GalaxyBackground: React.FC = () => {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -94,14 +95,31 @@ const Join = () => {
           direction="top"
           className="text-5xl font-bold mb-8"
           />
-        <div className="text-xl mb-6">
-          Lorem ipsum, dolor sit amet coasectetur adipisicing elit. Neque ullam illo possimus qui numquam veritatis ad iure ipsum dignissimos quos officiis eius natus vel quas ipsa corporis, odit autem nulla?
-        </div>
+        <BlurText
+          text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+          delay={20}
+          animateBy="words"
+          direction="top"
+          className="text-xl mb-8"
+          />
         <div className="w-full">
+          <AnimatedContent
+            distance={150}
+            direction="vertical"
+            reverse={false}
+            duration={1}
+            ease="power3.out"
+            initialOpacity={0.0}
+            animateOpacity
+            scale={1.0}
+            threshold={0}
+            delay={0.3}
+          >
           <textarea
-            className="w-full md:w-[32rem] h-64 p-4 bg-transparent backdrop-blur-md text-white mt-4 rounded-lg border border-white resize-none"
+            className="w-full md:w-[32rem] h-64 p-4 backdrop-blur-md text-white mt-4 rounded-lg border border-white resize-none"
             style={{ minWidth: "0" }}
           ></textarea>
+          </AnimatedContent>
         </div>
       </div>
     </div>
