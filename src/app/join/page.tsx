@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useRef, useEffect } from "react";
 import * as THREE from "three";
@@ -10,27 +10,37 @@ const GalaxyBackground: React.FC = () => {
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.PerspectiveCamera, galaxy: THREE.Object3D, galaxyGroup: THREE.Group, frameId: number;
+    let renderer: THREE.WebGLRenderer;
+    let scene: THREE.Scene;
+    let camera: THREE.PerspectiveCamera;
+    let galaxy: THREE.Object3D | null = null;
+    let galaxyGroup: THREE.Group;
+    let frameId: number;
 
     const mount = mountRef.current;
     if (!mount) return;
 
+    // Renderer setup
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     mount.appendChild(renderer.domElement);
 
+    // Scene and camera
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, mount.clientWidth / mount.clientHeight, 0.1, 100);
     camera.position.set(0, 3, 6);
     camera.lookAt(0, 0, 0);
 
+    // Lights
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0x222233, 1.2);
     scene.add(hemiLight);
 
+    // Galaxy Group
     galaxyGroup = new THREE.Group();
     scene.add(galaxyGroup);
 
+    // Load GLTF model
     const loader = new GLTFLoader();
     loader.load(
       "/models/galaxy.glb",
@@ -44,9 +54,14 @@ const GalaxyBackground: React.FC = () => {
         galaxy.position.sub(center);
 
         galaxyGroup.add(galaxy);
+      },
+      undefined,
+      (error) => {
+        console.error("Error loading GLTF:", error);
       }
     );
 
+    // Animation loop
     const animate = () => {
       if (galaxyGroup) {
         galaxyGroup.rotation.y += 0.001;
@@ -56,6 +71,7 @@ const GalaxyBackground: React.FC = () => {
     };
     animate();
 
+    // Resize handler
     const handleResize = () => {
       if (!mount) return;
       camera.aspect = mount.clientWidth / mount.clientHeight;
@@ -64,11 +80,14 @@ const GalaxyBackground: React.FC = () => {
     };
     window.addEventListener("resize", handleResize);
 
+    // Cleanup
     return () => {
       window.removeEventListener("resize", handleResize);
       if (frameId) cancelAnimationFrame(frameId);
-      if (renderer && renderer.domElement && mount) mount.removeChild(renderer.domElement);
-      renderer?.dispose();
+      if (renderer && renderer.domElement && mount.contains(renderer.domElement)) {
+        mount.removeChild(renderer.domElement);
+      }
+      renderer.dispose();
     };
   }, []);
 
@@ -92,14 +111,14 @@ const Join = () => {
           animateBy="words"
           direction="top"
           className="text-5xl font-bold mb-8"
-          />
+        />
         <BlurText
           text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
           delay={20}
           animateBy="words"
           direction="top"
           className="text-xl mb-8"
-          />
+        />
         <div className="w-full">
           <AnimatedContent
             distance={300}
@@ -112,17 +131,17 @@ const Join = () => {
             scale={1.1}
             delay={0.3}
           >
-          <textarea
-            className="w-full md:w-[60rem] h-64 p-4 backdrop-blur-md bg-black/60 md:bg-transparent text-white mt-4 border border-white resize-none"
-          ></textarea>
-          <div className="flex w-full md:w-[32rem] justify-center md:justify-start">
-            <button
-              className="mt-6 h-14 border border-white bg-black text-white font-semibold text-lg transition-all duration-300 ease-in-out
-                hover:bg-white hover:text-black hover:scale-105 active:scale-95 w-full md:w-48"
-            >
-              Send
-            </button>
-          </div>
+            <textarea
+              className="w-full md:w-[60rem] h-64 p-4 backdrop-blur-md bg-black/60 md:bg-transparent text-white mt-4 border border-white resize-none"
+              placeholder="Type your message here..."
+            ></textarea>
+            <div className="flex w-full md:w-[32rem] justify-center md:justify-start">
+              <button
+                className="mt-6 h-14 border border-white bg-black text-white font-semibold text-lg transition-all duration-300 ease-in-out hover:bg-white hover:text-black hover:scale-105 active:scale-95 w-full md:w-48"
+              >
+                Send
+              </button>
+            </div>
           </AnimatedContent>
         </div>
       </div>
@@ -130,4 +149,4 @@ const Join = () => {
   );
 };
 
-export default Join
+export default Join;
