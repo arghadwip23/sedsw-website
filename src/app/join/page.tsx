@@ -10,86 +10,75 @@ const GalaxyBackground: React.FC = () => {
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let renderer: THREE.WebGLRenderer;
-    let scene: THREE.Scene;
-    let camera: THREE.PerspectiveCamera;
-    let galaxy: THREE.Object3D | null = null;
-    let galaxyGroup: THREE.Group;
-    let frameId: number;
+  let galaxy: THREE.Object3D | null = null;
+  let frameId: number;
 
-    const mount = mountRef.current;
+  const mount = mountRef.current;
+  if (!mount) return;
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setSize(mount.clientWidth, mount.clientHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  mount.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, mount.clientWidth / mount.clientHeight, 0.1, 100);
+  camera.position.set(0, 3, 6);
+  camera.lookAt(0, 0, 0);
+
+  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x222233, 1.2);
+  scene.add(hemiLight);
+
+  const galaxyGroup = new THREE.Group();
+  scene.add(galaxyGroup);
+
+  const loader = new GLTFLoader();
+  loader.load(
+    "/models/galaxy.glb",
+    (gltf) => {
+      galaxy = gltf.scene;
+      galaxy.scale.set(2, 2, 2);
+
+      const box = new THREE.Box3().setFromObject(galaxy);
+      const center = new THREE.Vector3();
+      box.getCenter(center);
+      galaxy.position.sub(center);
+
+      galaxyGroup.add(galaxy);
+    },
+    undefined,
+    (error) => {
+      console.error("Error loading GLTF:", error);
+    }
+  );
+
+  const animate = () => {
+    if (galaxyGroup) {
+      galaxyGroup.rotation.y += 0.001;
+    }
+    renderer.render(scene, camera);
+    frameId = requestAnimationFrame(animate);
+  };
+  animate();
+
+  const handleResize = () => {
     if (!mount) return;
-
-    // Renderer setup
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    camera.aspect = mount.clientWidth / mount.clientHeight;
+    camera.updateProjectionMatrix();
     renderer.setSize(mount.clientWidth, mount.clientHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    mount.appendChild(renderer.domElement);
+  };
+  window.addEventListener("resize", handleResize);
 
-    // Scene and camera
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(45, mount.clientWidth / mount.clientHeight, 0.1, 100);
-    camera.position.set(0, 3, 6);
-    camera.lookAt(0, 0, 0);
+  return () => {
+    window.removeEventListener("resize", handleResize);
+    if (frameId) cancelAnimationFrame(frameId);
+    if (renderer && renderer.domElement && mount.contains(renderer.domElement)) {
+      mount.removeChild(renderer.domElement);
+    }
+    renderer.dispose();
+  };
+}, []);
 
-    // Lights
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x222233, 1.2);
-    scene.add(hemiLight);
-
-    // Galaxy Group
-    galaxyGroup = new THREE.Group();
-    scene.add(galaxyGroup);
-
-    // Load GLTF model
-    const loader = new GLTFLoader();
-    loader.load(
-      "/models/galaxy.glb",
-      (gltf) => {
-        galaxy = gltf.scene;
-        galaxy.scale.set(2, 2, 2);
-
-        const box = new THREE.Box3().setFromObject(galaxy);
-        const center = new THREE.Vector3();
-        box.getCenter(center);
-        galaxy.position.sub(center);
-
-        galaxyGroup.add(galaxy);
-      },
-      undefined,
-      (error) => {
-        console.error("Error loading GLTF:", error);
-      }
-    );
-
-    // Animation loop
-    const animate = () => {
-      if (galaxyGroup) {
-        galaxyGroup.rotation.y += 0.001;
-      }
-      renderer.render(scene, camera);
-      frameId = requestAnimationFrame(animate);
-    };
-    animate();
-
-    // Resize handler
-    const handleResize = () => {
-      if (!mount) return;
-      camera.aspect = mount.clientWidth / mount.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(mount.clientWidth, mount.clientHeight);
-    };
-    window.addEventListener("resize", handleResize);
-
-    // Cleanup
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      if (frameId) cancelAnimationFrame(frameId);
-      if (renderer && renderer.domElement && mount.contains(renderer.domElement)) {
-        mount.removeChild(renderer.domElement);
-      }
-      renderer.dispose();
-    };
-  }, []);
 
   return (
     <div
