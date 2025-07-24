@@ -88,7 +88,7 @@ export default function About() {
   return (
     
     <div className="w-full h-screen flex flex-col justify-center relative bg-black -z-[10]">
-      <div className=" absolute top-20 md:top-40 lg:top-10   px-2 lg:pl-10 lg:flex gap-20 justify-between items-center ">
+      <div className=" absolute top-20 md:top-40 lg:top-40   px-2 lg:pl-10 lg:flex gap-20 justify-between items-center ">
        <div>
         <p className="lg:pr-20 lg:w-[70%]"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu turpis molestie, dictum est a, mattis tellus. Sed dignissim, metu nec fringilla accumsan, risus sem sollicitudin lacus, ut interdum tellus elit sed risus. Maecenas eget condimentum velit,
 sit amet feugiat lectus. Class aptent taciti sociosqu ad litora 
