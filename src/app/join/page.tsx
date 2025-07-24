@@ -21,10 +21,9 @@ const GalaxyBackground: React.FC = () => {
     mount.appendChild(renderer.domElement);
 
     scene = new THREE.Scene();
-    // Move camera up and back, then look at the origin for a 45 degree angle
     camera = new THREE.PerspectiveCamera(45, mount.clientWidth / mount.clientHeight, 0.1, 100);
-    camera.position.set(0, 3, 6); // y=3 is higher, z=6 is back
-    camera.lookAt(0, 0, 0);      // look at the center of the galaxy
+    camera.position.set(0, 3, 6);
+    camera.lookAt(0, 0, 0);
 
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0x222233, 1.2);
     scene.add(hemiLight);
@@ -39,19 +38,18 @@ const GalaxyBackground: React.FC = () => {
         galaxy = gltf.scene;
         galaxy.scale.set(2, 2, 2);
 
-        // Center the galaxy model
         const box = new THREE.Box3().setFromObject(galaxy);
         const center = new THREE.Vector3();
         box.getCenter(center);
-        galaxy.position.sub(center); // Move the center to (0,0,0)
+        galaxy.position.sub(center);
 
-        galaxyGroup.add(galaxy); // Add to group at origin
+        galaxyGroup.add(galaxy);
       }
     );
 
     const animate = () => {
       if (galaxyGroup) {
-        galaxyGroup.rotation.y += 0.002; // rotate the group, not the mesh
+        galaxyGroup.rotation.y += 0.001;
       }
       renderer.render(scene, camera);
       frameId = requestAnimationFrame(animate);
@@ -85,9 +83,9 @@ const GalaxyBackground: React.FC = () => {
 
 const Join = () => {
   return (
-    <div className="relative w-full h-screen flex items-center justify-center">
+    <div className="relative w-full h-screen flex items-center justify-center bg-black/40">
       <GalaxyBackground />
-      <div className="z-10 flex flex-col md:items-start items-center md:justify-center justify-start absolute left-0 top-0 h-full w-full md:w-1/2 px-6 md:px-16 pt-24">
+      <div className="flex flex-col md:justify-center justify-start absolute left-0 top-16 md:top-0 h-full w-full md:w-1/2 px-6 md:px-16 pt-24">
         <BlurText
           text="Join Us"
           delay={150}
@@ -104,21 +102,27 @@ const Join = () => {
           />
         <div className="w-full">
           <AnimatedContent
-            distance={150}
+            distance={300}
             direction="vertical"
             reverse={false}
             duration={1}
             ease="power3.out"
-            initialOpacity={0.0}
+            initialOpacity={1.0}
             animateOpacity
-            scale={1.0}
-            threshold={0}
+            scale={1.1}
             delay={0.3}
           >
           <textarea
-            className="w-full md:w-[32rem] h-64 p-4 backdrop-blur-md text-white mt-4 rounded-lg border border-white resize-none"
-            style={{ minWidth: "0" }}
+            className="w-full md:w-[60rem] h-64 p-4 backdrop-blur-md bg-black/60 md:bg-transparent text-white mt-4 border border-white resize-none"
           ></textarea>
+          <div className="flex w-full md:w-[32rem] justify-center md:justify-start">
+            <button
+              className="mt-6 h-14 border border-white bg-black text-white font-semibold text-lg transition-all duration-300 ease-in-out
+                hover:bg-white hover:text-black hover:scale-105 active:scale-95 w-full md:w-48"
+            >
+              Send
+            </button>
+          </div>
           </AnimatedContent>
         </div>
       </div>
