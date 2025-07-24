@@ -18,14 +18,14 @@ export default function SecondNav() {
   const elements: Navlink[] = [
     { label: 'Home', href: '/' },
     { label: 'About us', href: '/about' },
-    { label: 'Event', href: '/event' },
-    { label: 'Project', href: '/project' },
+    { label: 'Event', href: '/events' },
+    { label: 'Project', href: '/projects' },
     { label: 'Gallery', href: '/gallery' },
     { label: 'Join Us', href: '/join' },
   ];
 
   return (
-    <nav className='justify-between px-10 p-3 hidden lg:flex items-center'>
+    <nav className='justify-between px-10 p-3 hidden lg:flex items-center fixed w-full bg-transparent z-[2000]'>
       <Image src={`/logo.svg`} width={65} height={65} alt="logo" />
       <div>
         <ul className='flex gap-7 font-semibold'>

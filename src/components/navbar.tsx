@@ -8,6 +8,8 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import DecryptedText from '../../TextAnimations/DecryptedText/DecryptedText';
 
+
+
 const menuLinks = [
     { path: "/", label: "Home" },
     { path: "/about", label: "About" },
