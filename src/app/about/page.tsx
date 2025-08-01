@@ -18,53 +18,43 @@ import { OrbitControls } from "@react-three/drei";
 // import * as THREE from "three";
   function MoonScene() {
   const ref = useRef<THREE.Group>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [lastMouse, setLastMouse] = useState({ x: 0, y: 0 });
-  const [rotation, setRotation] = useState({ xSpeed: 0, ySpeed: 0 });
+  const [lastMouse, setLastMouse] = useState<{ x: number; y: number } | null>(null);
+  const [mouseInfluence, setMouseInfluence] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    const handleMouseDown = (e: MouseEvent) => {
-      setIsDragging(true);
-      setLastMouse({ x: e.clientX, y: e.clientY });
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-    };
-
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging) return;
+      if (lastMouse) {
+        const deltaX = e.clientX - lastMouse.x;
+        const deltaY = e.clientY - lastMouse.y;
 
-      const deltaX = e.clientX - lastMouse.x;
-      const deltaY = e.clientY - lastMouse.y;
+        // Apply a small influence on rotation speed
+        setMouseInfluence({
+          x: deltaY * 0.001,
+          y: deltaX * 0.001,
+        });
+      }
       setLastMouse({ x: e.clientX, y: e.clientY });
-
-      setRotation({
-        xSpeed: deltaY * 0.01, // vertical drag rotates X
-        ySpeed: deltaX * 0.01, // horizontal drag rotates Y
-      });
     };
 
-    window.addEventListener("mousedown", handleMouseDown);
-    window.addEventListener("mouseup", handleMouseUp);
     window.addEventListener("mousemove", handleMouseMove);
-
     return () => {
-      window.removeEventListener("mousedown", handleMouseDown);
-      window.removeEventListener("mouseup", handleMouseUp);
       window.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [isDragging, lastMouse]);
+  }, [lastMouse]);
 
   useFrame(() => {
     if (ref.current) {
-      ref.current.rotation.y += rotation.ySpeed;
-      ref.current.rotation.x += rotation.xSpeed;
+      // Base idle rotation
+      ref.current.rotation.y += 0.002;
 
-      // Inertia (friction)
-      setRotation((prev) => ({
-        xSpeed: prev.xSpeed * 0.55,
-        ySpeed: prev.ySpeed * 0.55,
+      // Add subtle mouse influence
+      ref.current.rotation.x += mouseInfluence.x;
+      ref.current.rotation.y += mouseInfluence.y;
+
+      // Slowly fade out mouse influence (like easing)
+      setMouseInfluence((prev) => ({
+        x: prev.x * 0.9,
+        y: prev.y * 0.9,
       }));
     }
   });
@@ -75,6 +65,8 @@ import { OrbitControls } from "@react-three/drei";
     </group>
   );
 }
+
+
 
 
 
@@ -96,7 +88,7 @@ torquent per conubia nostra, per inceptos himenaeos.
 Praesent auctor purus luctus enim egestas,
 ac scelerisque ante</p>
        </div>
-<div className="flex justify-end mt-20 lg:mt-0 ">
+<div className="flex lg:justify-end mt-20 lg:mt-0 ">
   <div className="text-left">
     <h2 className="font-semibold text-3xl tracking-wider">About&nbsp;Us</h2>
     
