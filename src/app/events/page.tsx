@@ -126,7 +126,7 @@ export default function Events() {
         />
       </div>
 
-      <div className="flex flex-col z-10 pt-16">
+      <div className="flex flex-col z-10 -mt-30">
         <h1 className="text-3xl font-bold text-white md:mb-16 md:self-end md:pr-36 md:text-right text-center mb-8">
           Our Events
         </h1>
@@ -206,7 +206,7 @@ export default function Events() {
       </div>
       {/* Next Page Button */}
       <Link
-        href="/projects"
+        href="/gallery"
         className="fixed bottom-8 right-8 z-30 px-6 py-3 bg-white text-black font-semibold shadow-lg transition-all duration-300 ease-out
           hover:bg-black hover:text-white hover:scale-105 group flex items-center gap-2"
       >
