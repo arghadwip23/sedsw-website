@@ -142,6 +142,7 @@ const initialFormData: Application = {
         setErrorMessage(`❌ Failed: ${data.message || "Something went wrong"}`);
       }
     } catch (error) {
+      console.error("Application submission error:", error);
       setErrorMessage("❌ Network error. Please try again later.");
     } finally {
       setLoading(false);
