@@ -5,7 +5,8 @@ import * as THREE from "three";
 import BlurText from "../../../TextAnimations/BlurText/BlurText";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import AnimatedContent from "../../../Animations/AnimatedContent/AnimatedContent";
-import { supabase } from "../../../lib/supabaseClient"; // adjust path as needed
+//import { supabase } from "../../../lib/supabaseClient"; // adjust path as needed
+//instead of supabase send request to internal route
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -117,35 +118,35 @@ const Join = () => {
     const { registration_number, phone } = formData;
   
     // 1. Check for existing entry
-    const { data: existing, error: fetchError } = await supabase
-      .from("applications")
-      .select("*")
-      .or(`registration_number.eq.${registration_number},phone.eq.${phone}`);
+    // const { data: existing, error: fetchError } = await supabase
+    //   .from("applications")
+    //   .select("*")
+    //   .or(`registration_number.eq.${registration_number},phone.eq.${phone}`);
   
-    if (fetchError) {
-      alert("Error checking existing data: " + fetchError.message);
-      return;
-    }
+    // if (fetchError) {
+    //   alert("Error checking existing data: " + fetchError.message);
+    //   return;
+    // }
     
 
     // 2. If a match is found, show already registered message
   
-    if (existing.length > 0) {
-      const regUsed = existing.some(
-        (row) => row.registration_number === registration_number
-      );
-      const phoneUsed = existing.some((row) => row.phone === phone);
+    // if (existing.length > 0) {
+    //   const regUsed = existing.some(
+    //     (row) => row.registration_number === registration_number
+    //   );
+    //   const phoneUsed = existing.some((row) => row.phone === phone);
       
     
-      if (regUsed && phoneUsed) {
-        setShowAlreadyRegistered(true);
-      } else if (regUsed) {
-        setShowAlreadyRegistered(true);
-      } else if (phoneUsed) {
-        setShowAlreadyRegistered(true);
-      }
-      return;
-    }
+    //   if (regUsed && phoneUsed) {
+    //     setShowAlreadyRegistered(true);
+    //   } else if (regUsed) {
+    //     setShowAlreadyRegistered(true);
+    //   } else if (phoneUsed) {
+    //     setShowAlreadyRegistered(true);
+    //   }
+    //   return;
+    // }
     if (formData.department === formData.department_2) {
       setErrorMessage("Primary and secondary department preferences must be different.");
       return;
@@ -155,33 +156,33 @@ const Join = () => {
     
     
     // 3. Otherwise, insert new data
-    const { error: insertError } = await supabase.from("applications").insert([
-  {
-    full_name: formData.full_name,
-    registration_number: formData.registration_number,
-    email: formData.email,
-    phone: formData.phone,
-    why_join: formData.why_join,
-    department: formData.department,
-    department_2: formData.department_2,
-  },
-]);
+//   const { error: insertError } = await supabase.from("applications").insert([
+//   {
+//     full_name: formData.full_name,
+//     registration_number: formData.registration_number,
+//     email: formData.email,
+//     phone: formData.phone,
+//     why_join: formData.why_join,
+//     department: formData.department,
+//     department_2: formData.department_2,
+//   },
+// ]);
 
-if (insertError) {
-  // Check if it's a unique constraint violation
-  if (
-    insertError?.message?.includes("duplicate key value") &&
-    insertError.message.includes("unique_registration_or_phone") ||
-    insertError.message.includes("unique_phone") ||
-    insertError.message.includes("unique_reg")
-  ) {
-    setShowAlreadyRegistered(true);
-  } else {
-    console.error("Insert failed:", insertError?.message || insertError || "Unknown error");
+// if (insertError) {
+//   // Check if it's a unique constraint violation
+//   if (
+//     insertError?.message?.includes("duplicate key value") &&
+//     insertError.message.includes("unique_registration_or_phone") ||
+//     insertError.message.includes("unique_phone") ||
+//     insertError.message.includes("unique_reg")
+//   ) {
+//     setShowAlreadyRegistered(true);
+//   } else {
+//     console.error("Insert failed:", insertError?.message || insertError || "Unknown error");
 
-  }
-  return;
-}
+//   }
+//   return;
+// }
 setShowThankYou(true);
 
   };
