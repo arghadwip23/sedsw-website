@@ -72,11 +72,11 @@ export default function verificationEmailTemplate(name: string, verificationLink
 <body>
   <div class="container">
     <div class="card">
-      <h1 class="title">🌌 Verify Your Mission Access</h1>
+      <h1 class="title">wellcome ${name} Verify Your Mission Access</h1>
       <p class="subtitle">Your journey among the stars is about to begin.  
       Confirm your identity to board the spacecraft.</p>
 
-      <a href="{verification_link}" class="button">Verify Email</a>
+      <a href="${verificationLink}" class="button">Verify Email</a>
 
       <p class="footer">If you didn’t request this, you can safely ignore this message.<br>
       © 2025 SEDS Antariksh. All rights reserved.</p>
