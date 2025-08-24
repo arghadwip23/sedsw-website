@@ -36,7 +36,7 @@ export async function POST(req: Request) {
     }
 
     // 2️⃣ Create new user (password gets hashed by model pre-save hook)
-    const newUser = await User.create({
+    await User.create({
       name,
       registrationNumber,
       email,
@@ -58,13 +58,13 @@ export async function POST(req: Request) {
       },
       { status: 201 }
     );
-  } catch (error: any) {
-    console.error("Signup Error:", error.message);
+  } catch (error: unknown) {
+    console.error("Signup Error:", error instanceof Error ? error.message : 'Unknown error');
     return NextResponse.json<ApiResponse>(
       {
         success: false,
         message: "Server error. Please try again later.",
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );

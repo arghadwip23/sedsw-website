@@ -1,5 +1,5 @@
 // app/api/test/route.ts
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import bcrypt from "bcrypt";
@@ -29,8 +29,11 @@ export async function GET() {
       passwordHashLength: user.password.length,
       isValidBcryptHash: user.password.startsWith('$2b$') || user.password.startsWith('$2a$'),
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Test route error:", error);
-    return NextResponse.json({ error: "Test failed", details: error?.message || "Unknown error" }, { status: 500 });
+    return NextResponse.json({ 
+      error: "Test failed", 
+      details: error instanceof Error ? error.message : "Unknown error" 
+    }, { status: 500 });
   }
 }
