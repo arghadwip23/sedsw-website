@@ -1,19 +1,29 @@
 // models/ApplicationModel.ts
-import { Schema, model, models } from "mongoose";
-import { Application } from "@/types/Application";
+import mongoose, { Schema, Document } from "mongoose";
 
-const ApplicationSchema = new Schema<Application>({
-  fullName: { type: String, required: true },
-  registrationNumber: { type: String, required: true },
-  email: { type: String, required: true },
-  phone: { type: String, required: true },
-  primaryDepartment: { type: String, required: true },
-  secondaryDepartment: { type: String, required: true },
-  motivation: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
+export interface ApplicationDocument extends Document {
+  fullName: string;
+  registrationNumber: string;
+  email: string;
+  phone: string;
+  primaryDepartment: string;
+  secondaryDepartment?: string;
+  motivation: string;
+  verified: boolean;
+  verificationToken: string | null;
+}
+
+const ApplicationSchema = new Schema<ApplicationDocument>({
+  fullName: String,
+  registrationNumber: { type: String, unique: true },
+  email: { type: String, unique: true },
+  phone: String,
+  primaryDepartment: String,
+  secondaryDepartment: String,
+  motivation: String,
+  verified: { type: Boolean, default: false },
+  verificationToken: { type: String, default: null },
 });
 
-const ApplicationModel =
-  models.Application || model<Application>("Application", ApplicationSchema);
-
-export default ApplicationModel;
+export default mongoose.models.Application ||
+  mongoose.model<ApplicationDocument>("Application", ApplicationSchema);
