@@ -97,42 +97,45 @@ const SignupPage = () => {
     }));
   };
 
-  const handleSubmit = async () => {
-    if (!validateForm()) return;
+ const handleSubmit = async () => {
+  if (!validateForm()) return;
 
-    setIsLoading(true);
-    try {
-      const submitData = {
-        ...formData,
-        department: formData.department.name ? formData.department : { name: "", role: "none", isInRole: false }
-      };
-      // Remove confirmPassword before sending to API
-      const { confirmPassword, ...dataToSubmit } = submitData;
+  setIsLoading(true);
+  try {
+    const submitData = {
+      ...formData,
+      department: formData.department.name
+        ? formData.department
+        : { name: "", role: "none", isInRole: false },
+    };
 
+    // ✅ safely strip confirmPassword
+    const { confirmPassword: _, ...dataToSubmit } = submitData;
 
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(dataToSubmit),
-      });
+    const response = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(dataToSubmit),
+    });
 
-      const data = await response.json();
-      
-      if (data.success) {
-        alert('Registration successful! Redirecting to login...');
-        window.location.href = '/login';
-      } else {
-        alert(data.message || 'Registration failed');
-      }
-    } catch (error) {
-      console.error('Signup error:', error);
-      alert('An error occurred. Please try again.');
-    } finally {
-      setIsLoading(false);
+    const data = await response.json();
+
+    if (data.success) {
+      alert("Registration successful! Redirecting to login...");
+      window.location.href = "/login";
+    } else {
+      alert(data.message || "Registration failed");
     }
-  };
+  } catch (error) {
+    console.error("Signup error:", error);
+    alert("An error occurred. Please try again.");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     
