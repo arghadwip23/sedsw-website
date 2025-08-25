@@ -10,7 +10,7 @@ interface FormData {
   phoneNumber: string;
   branch: string;
   password: string;
-  confirmPassword: string;
+  confirmPassword?: string; // 👈 make optional
   department: {
     name: string;
     role: string;
@@ -19,6 +19,7 @@ interface FormData {
   orgRole: string;
   profilePicture: string;
 }
+
 
 const SignupPage = () => {
   const [formData, setFormData] = useState<FormData>({
@@ -97,7 +98,7 @@ const SignupPage = () => {
     }));
   };
 
- const handleSubmit = async () => {
+const handleSubmit = async () => {
   if (!validateForm()) return;
 
   setIsLoading(true);
@@ -109,15 +110,15 @@ const SignupPage = () => {
         : { name: "", role: "none", isInRole: false },
     };
 
-    // ✅ safely strip confirmPassword
-    const { confirmPassword: _, ...dataToSubmit } = submitData;
+    // ✅ remove confirmPassword before sending
+    delete submitData.confirmPassword;
 
     const response = await fetch("/api/auth/signup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(dataToSubmit),
+      body: JSON.stringify(submitData),
     });
 
     const data = await response.json();
@@ -135,6 +136,7 @@ const SignupPage = () => {
     setIsLoading(false);
   }
 };
+
 
 
   return (
