@@ -107,7 +107,7 @@ const SignupPage = () => {
         department: formData.department.name ? formData.department : { name: "", role: "none", isInRole: false }
       };
       // Remove confirmPassword before sending to API
-      const { confirmPassword, ...dataToSubmit } = submitData;
+      const { confirmPassword: _confirmPassword, ...dataToSubmit } = submitData;
 
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
