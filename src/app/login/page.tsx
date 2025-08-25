@@ -1,5 +1,6 @@
 "use client"
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { Eye, EyeOff, Mail, Lock, LogIn, UserCircle, ArrowRight } from 'lucide-react';
 
 interface FormData {
@@ -76,6 +77,7 @@ const LoginPage = () => {
         alert(data.message || 'Login failed');
       }
     } catch (error) {
+      console.error('Login error:', error);
       alert('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
@@ -193,12 +195,12 @@ const LoginPage = () => {
 
             {/* Forgot Password Link */}
             <div className="text-right">
-              <a
+              <Link
                 href="/forgot-password"
                 className="text-sm text-purple-400 hover:text-purple-300 transition-colors font-medium"
               >
                 Forgot your password?
-              </a>
+              </Link>
             </div>
 
             {/* Login Button */}
@@ -225,10 +227,10 @@ const LoginPage = () => {
             {/* Sign Up Link */}
             <div className="text-center pt-6 border-t border-gray-700/50">
               <p className="text-gray-400">
-                Don't have an account?{' '}
-                <a href="/signup" className="text-purple-400 hover:text-purple-300 font-medium transition-colors">
+                Don&apos;t have an account?{' '}
+                <Link href="/signup" className="text-purple-400 hover:text-purple-300 font-medium transition-colors">
                   Create one here
-                </a>
+                </Link>
               </p>
             </div>
           </div>

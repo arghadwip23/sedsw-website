@@ -1,6 +1,7 @@
 'use client'
 import React, { useState } from 'react';
-import { Eye, EyeOff, User, Mail, Phone, Building, Lock, Camera, UserCheck, Users, Award } from 'lucide-react';
+import Link from 'next/link';
+import { Eye, EyeOff, User, Mail, Phone, Building, Lock, UserCheck, Users } from 'lucide-react';
 
 interface FormData {
   name: string;
@@ -105,14 +106,15 @@ const SignupPage = () => {
         ...formData,
         department: formData.department.name ? formData.department : { name: "", role: "none", isInRole: false }
       };
-      delete (submitData as any).confirmPassword;
+      // Remove confirmPassword before sending to API
+      const { confirmPassword, ...dataToSubmit } = submitData;
 
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(submitData),
+        body: JSON.stringify(dataToSubmit),
       });
 
       const data = await response.json();
@@ -124,6 +126,7 @@ const SignupPage = () => {
         alert(data.message || 'Registration failed');
       }
     } catch (error) {
+      console.error('Signup error:', error);
       alert('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
@@ -377,9 +380,9 @@ const SignupPage = () => {
               <div className="text-center mt-6">
                 <p className="text-gray-400">
                   Already have an account?{' '}
-                  <a href="/login" className="text-purple-400 hover:text-purple-300 font-medium transition-colors">
+                  <Link href="/login" className="text-purple-400 hover:text-purple-300 font-medium transition-colors">
                     Sign in here
-                  </a>
+                  </Link>
                 </p>
               </div>
             </div>
