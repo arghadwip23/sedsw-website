@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import { Rocket, Home, ArrowLeft, Satellite, Zap } from 'lucide-react';
+import { Home, ArrowLeft, Satellite, Zap } from 'lucide-react';
 
 const Space404Page = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -181,7 +181,7 @@ const Space404Page = () => {
              Houston, We Have a Problem! 
           </h3>
           <p className="text-gray-400 text-lg mb-6">
-            It looks like you've drifted into the cosmic void! The page you're looking for has been 
+            It looks like you&apos;ve drifted into the cosmic void! The page you&apos;re looking for has been 
             launched into deep space or consumed by a black hole.
           </p>
           <div className="bg-gray-900/50 backdrop-blur-md border border-gray-700 rounded-2xl p-6 mb-8">
