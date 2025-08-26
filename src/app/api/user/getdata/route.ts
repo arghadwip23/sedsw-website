@@ -35,10 +35,11 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true, data: user }, { status: 200 });
-  } catch (err: any) {
-    console.error("GetData Error:", err.message);
+  } catch (err: unknown) {
+    console.error("GetData Error:", err);
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
     return NextResponse.json(
-      { success: false, message: "Invalid or expired token", error: err.message },
+      { success: false, message: "Invalid or expired token", error: errorMessage },
       { status: 401 }
     );
   }

@@ -21,31 +21,31 @@ export async function POST(req: Request) {
     const buffer = Buffer.from(bytes);
 
     // Upload to Cloudinary
-    const uploadRes = await new Promise((resolve, reject) => {
+    const uploadRes = await new Promise<{ secure_url: string }>((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         {
           folder: "gallery",
         },
         (err, result) => {
           if (err) reject(err);
-          else resolve(result);
+          else if (result) resolve({ secure_url: result.secure_url });
+          else reject(new Error('Upload failed'));
         }
       );
       stream.end(buffer);
     });
 
-    const uploadResult = uploadRes as any;
-
     // Save to DB
     const newImage = await Image.create({
-      url: uploadResult.secure_url,
+      url: uploadRes.secure_url,
       description,
       eventId,
     });
 
     return NextResponse.json({ success: true, data: newImage });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Upload error:", error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Upload failed';
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }
