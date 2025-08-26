@@ -1,39 +1,14 @@
-// app/api/test/route.ts
 import { NextResponse } from "next/server";
-import connectDB from "@/lib/mongodb";
-import User from "@/models/User";
-import bcrypt from "bcrypt";
+import cloudinary from "@/lib/cloudinary";
 
 export async function GET() {
   try {
-    await connectDB();
+    const result = await cloudinary.api.ping();
+    console.log(result);
     
-    // Get a sample user
-    const user = await User.findOne({});
-    
-    if (!user) {
-      return NextResponse.json({ message: "No users found" });
-    }
-
-    // Test password comparison manually
-    const testPassword = "test123"; // Replace with a known password
-    const isMatch = await bcrypt.compare(testPassword, user.password);
-    const isMatchMethod = await user.comparePassword(testPassword);
-
-    return NextResponse.json({
-      message: "Debug info",
-      userEmail: user.email,
-      passwordHash: user.password,
-      bcryptDirectMatch: isMatch,
-      modelMethodMatch: isMatchMethod,
-      passwordHashLength: user.password.length,
-      isValidBcryptHash: user.password.startsWith('$2b$') || user.password.startsWith('$2a$'),
-    });
+    return NextResponse.json({ success: true, result });
   } catch (error: unknown) {
-    console.error("Test route error:", error);
-    return NextResponse.json({ 
-      error: "Test failed", 
-      details: error instanceof Error ? error.message : "Unknown error" 
-    }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }
