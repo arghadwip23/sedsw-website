@@ -81,9 +81,9 @@ export default function About() {
   }, []);
 
   return (
-    <div className="w-full h-screen flex flex-col justify-center relative overflow-hidden">
-      <div className="absolute top-24 md:top-10 left-0 w-full flex flex-col items-center z-10">
-        <div className="backdrop-blur-sm border border-white/10 rounded-3xl shadow-2xl px-8 py-12 max-w-6xl mx-auto flex flex-col lg:flex-row gap-16 items-start">
+    <div className="w-full h-screen flex items-center justify-center relative">
+      <div className="absolute top-24 md:top-56 md:pb-0 left-0 w-full flex flex-col items-center z-10">
+        <div className="backdrop-blur-sm border border-white/10 bg-black/10 rounded-3xl shadow-2xl px-8 py-12 max-w-6xl mx-auto flex flex-col lg:flex-row gap-16 items-center">
           <div className="flex-1 min-w-[300px]">
             <DecryptedText
               text="About Us"
@@ -103,10 +103,10 @@ export default function About() {
               delay={10}
             />
           </div>
-          <div className="flex flex-col items-center flex-1 min-w-[300px]">
-            <div className="grid grid-cols-1 gap-6 w-full max-w-md">
-              <div className="group hover:scale-105 transition-all duration-300 backdrop-blur-sm bg-black/20 border border-white/10 rounded-xl p-6">
-                <div className="flex items-center gap-4">
+          <div className="flex flex-col items-center flex-1 min-w-full sm:min-w-[300px]">
+            <div className="grid grid-cols-1 gap-6 w-full">
+              <div className="group hover:scale-105 transition-all duration-300 backdrop-blur-sm bg-black/20 border border-white/10 rounded-xl p-6 w-full">
+                <div className="flex items-center center gap-4">
                   <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
                     <img src="./aboutHome.svg" alt="Home" className="w-6 h-6" />
                   </div>
@@ -117,7 +117,7 @@ export default function About() {
                 </div>
               </div>
               
-              <div className="group hover:scale-105 transition-all duration-300 backdrop-blur-sm bg-black/20 border border-white/10 rounded-xl p-6">
+              <div className="group hover:scale-105 transition-all duration-300 backdrop-blur-sm bg-black/20 border border-white/10 rounded-xl p-6 w-full">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
                     <img src="./aboutGroup.svg" alt="Group" className="w-6 h-6" />
@@ -129,7 +129,7 @@ export default function About() {
                 </div>
               </div>
               
-              <div className="group hover:scale-105 transition-all duration-300 backdrop-blur-sm bg-black/20 border border-white/10 rounded-xl p-6">
+              <div className="group hover:scale-105 transition-all duration-300 backdrop-blur-sm bg-black/20 border border-white/10 rounded-xl p-6 w-full">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
                     <img src="./aboutEvents.svg" alt="Events" className="w-6 h-6" />
@@ -141,7 +141,7 @@ export default function About() {
                 </div>
               </div>
               
-              <div className="group hover:scale-105 transition-all duration-300 backdrop-blur-sm bg-black/20 border border-white/10 rounded-xl p-6">
+              <div className="group hover:scale-105 transition-all duration-300 backdrop-blur-sm bg-black/20 border border-white/10 rounded-xl p-6 w-full">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
                     <img src="./aboutLocation.svg" alt="Location" className="w-6 h-6" />
