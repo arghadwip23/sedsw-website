@@ -79,7 +79,7 @@ export function Navbar() {
         <div className="menu-container z-50 lg:hidden" ref={container}>
             <div className="menu-bar">
                 <div className="menu-logo">
-                    <Link href={"/"}>Antariksh</Link>
+                    <Link href={"/"}>SEDS Antariksh</Link>
                 </div>
                 <div className="menu-open" onClick={toggleMenu}>
                     <p>Menu</p>

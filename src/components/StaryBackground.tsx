@@ -1,48 +1,76 @@
 "use client";
-
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Grid } from "@react-three/drei";
+import { Points, PointMaterial } from "@react-three/drei";
 import * as THREE from "three";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 
-function GridBackground() {
-  const gridRef = useRef<THREE.Object3D>(null!);
+// 🌌 Star Field Component
+function Stars() {
+  const ref = useRef<THREE.Points>(null!);
 
-  // Animate slight pulsing / rotation
+  // Generate random star positions once
+  const positions = useMemo(() => {
+    const pos = new Float32Array(5000 * 3);
+    for (let i = 0; i < 5000 * 3; i++) pos[i] = (Math.random() - 0.5) * 300;
+    return pos;
+  }, []);
+
+  // Rotate stars slowly and respond to mouse movement
   useFrame((state) => {
-    if (gridRef.current) {
-      gridRef.current.rotation.z = state.clock.elapsedTime * 0.02; // slow spin
+    if (!ref.current) return;
+    ref.current.rotation.y = state.mouse.x * 0.5;
+    ref.current.rotation.x = -state.mouse.y * 0.5;
+  });
+
+  return (
+    <Points ref={ref} positions={positions} stride={3} frustumCulled>
+      <PointMaterial
+        transparent
+        color="#ffffff"
+        size={0.6}
+        sizeAttenuation
+        depthWrite={false}
+      />
+    </Points>
+  );
+}
+
+// ☀️ Glowing Planet / Sun
+function GlowSphere() {
+  const meshRef = useRef<THREE.Mesh>(null!);
+
+  // Gentle pulse animation
+  useFrame(({ clock }) => {
+    if (meshRef.current) {
+      const scale = 1 + Math.sin(clock.elapsedTime * 2) * 0.05;
+      meshRef.current.scale.set(scale, scale, scale);
     }
   });
 
   return (
-    <group ref={gridRef}>
-      <Grid
-        args={[100, 100]} // grid size
-        cellSize={1}
-        cellThickness={0.5}
-        cellColor={"#00ffff"} // cyan lines
-        sectionSize={5}
-        sectionThickness={1.5}
-        sectionColor={"#ff00ff"} // magenta bold lines
-        fadeDistance={50}
-        fadeStrength={1}
-        infiniteGrid // makes it endless
+    <mesh ref={meshRef}>
+      <sphereGeometry args={[2, 64, 64]} />
+      <meshStandardMaterial
+        emissive={"#ff66cc"}
+        emissiveIntensity={2.5}
+        color={"#330033"}
       />
-    </group>
+    </mesh>
   );
 }
 
-export default function StarryBackground() {
+// 🎨 The Background Component
+export default function CosmicBackground() {
   return (
     <Canvas
-      className="relative  inset-0 -z-4 w-screen h-screen"
-      camera={{ position: [0, 20, 40], fov: 60 }}
+      camera={{ position: [0, 0, 10], fov: 75 }}
+      className="absolute inset-0 -z-10"
     >
-      {/* Lighting to make lines glow */}
-      <ambientLight intensity={10} />
-      <pointLight position={[10, 10, 10]} intensity={1.2} color="#00ffff" />
-      <GridBackground />
+      <ambientLight intensity={0.2} />
+      <pointLight position={[5, 5, 5]} intensity={2} color={"#ff99cc"} />
+
+      <GlowSphere />
+      <Stars />
     </Canvas>
   );
 }
