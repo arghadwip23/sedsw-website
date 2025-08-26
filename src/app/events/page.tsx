@@ -122,7 +122,7 @@ export default function Events() {
   }, [isLoading]);
 
   return (
-    <div className="w-full h-screen flex flex-col justify-center relative z-0">
+    <div className="w-full h-screen flex flex-col justify-center relative ">
       {/* Loading overlay */}
       {isLoading && (
         <div className="absolute inset-0 z-50 bg-black flex flex-col items-center justify-center">
@@ -150,7 +150,7 @@ export default function Events() {
         />
       </div>
 
-      <div className="flex flex-col z-10 -mt-30">
+      <div className="flex flex-col z-2 -mt-30">
         <h1 className="text-3xl font-bold text-white md:mb-16 md:self-end md:pr-36 md:text-right text-center mb-8">
           Our Events
         </h1>
