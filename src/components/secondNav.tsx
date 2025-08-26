@@ -25,7 +25,7 @@ export default function SecondNav() {
   ];
 
   return (
-    <nav className='justify-between px-10 p-3 hidden lg:flex items-center remove w-full bg-transparent z-[2000]'>
+    <nav className='justify-between px-10 p-3 hidden lg:flex items-center remove w-full bg-transparent z-[4000]'>
       <Image src={`/logo.svg`} width={65} height={65} alt="logo" />
       <div>
         <ul className='flex gap-7 font-semibold'>

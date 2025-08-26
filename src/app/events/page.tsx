@@ -3,13 +3,38 @@
 import Link from "next/link";
 import React, { useState, useRef, useEffect } from "react";
 import SpotlightCard from "../../../Components/SpotlightCard/SpotlightCard";
-import { events } from "../../data/events";
+
+interface Event {
+  _id: string;
+  eventName: string;
+  location: string;
+  date: string;
+  category: string;
+  thumbnail?: string;
+}
 
 export default function Events() {
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
+  const [events, setEvents] = useState<Event[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Fetch events from backend
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const res = await fetch("/api/events/list");
+        const data = await res.json();
+        if (data.success) {
+          setEvents(data.data);
+        }
+      } catch (err) {
+        console.error("Error fetching events:", err);
+      }
+    };
+    fetchEvents();
+  }, []);
 
   // Loader for video progress
   useEffect(() => {
@@ -45,6 +70,7 @@ export default function Events() {
     };
   }, []);
 
+  // Scroll behavior
   const scrollByCards = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
     const cardWidth = scrollRef.current.firstElementChild?.clientWidth || 300;
@@ -107,9 +133,7 @@ export default function Events() {
             ></div>
           </div>
           <p className="text-white text-lg">Loading Video...</p>
-          <p className="text-gray-400 text-sm mt-2">
-            {progress}%
-          </p>
+          <p className="text-gray-400 text-sm mt-2">{progress}%</p>
         </div>
       )}
 
@@ -140,32 +164,39 @@ export default function Events() {
             onTouchMove={handleTouchMove}
           >
             <div style={{ minWidth: 24, maxWidth: 24, pointerEvents: "none" }} aria-hidden="true" />
-            {events.map((event, idx) => (
-              <div
-                key={idx}
-                className="snap-center flex-shrink-0"
-                style={{ minWidth: 320, maxWidth: 340 }}
-              >
-                <SpotlightCard
-                  className="custom-spotlight-card w-full"
-                  spotlightColor="rgba(255, 255, 255, 0.4)"
-                >
-                  <div className="flex flex-col gap-2 p-4">
-                    <h2 className="text-xl font-bold">{event.name}</h2>
-                    <div className="w-full h-px bg-white/20 my-2" />
-                    <p className="text-sm text-gray-300">
-                      <span className="">{event.venue}</span>
-                    </p>
-                    <p className="text-sm text-gray-300">
-                      <span className=""> {event.dates}</span>
-                    </p>
-                    <p className="text-sm text-gray-300">
-                      <span className="font-semibold">{event.theme}</span>
-                    </p>
-                  </div>
-                </SpotlightCard>
-              </div>
-            ))}
+
+            {events.length > 0 ? (
+              events.map((event) => (
+                <div
+                  key={event._id}
+                  className="snap-center flex-shrink-0"
+                  style={{ minWidth: 320, maxWidth: 340 }}
+                ><Link href={`/events/${event._id}`}>
+                  <SpotlightCard
+                    className="custom-spotlight-card w-full"
+                    spotlightColor="rgba(255, 255, 255, 0.4)"
+                  >
+                    <div className="flex flex-col gap-2 p-4">
+                      <h2 className="text-xl font-bold">{event.eventName}</h2>
+                      <div className="w-full h-px bg-white/20 my-2" />
+                      <p className="text-sm text-gray-300">
+                        <span>{event.location}</span>
+                      </p>
+                      <p className="text-sm text-gray-300">
+                        <span>{event.date}</span>
+                      </p>
+                      <p className="text-sm text-gray-300">
+                        <span className="font-semibold">{event.category}</span>
+                      </p>
+                    </div>
+                  </SpotlightCard>
+                  </Link>
+                </div>
+              ))
+            ) : (
+              <p className="text-white">No events available</p>
+            )}
+
             <div style={{ minWidth: 24, maxWidth: 24, pointerEvents: "none" }} aria-hidden="true" />
           </div>
           {/* Thin scroll indicator */}
