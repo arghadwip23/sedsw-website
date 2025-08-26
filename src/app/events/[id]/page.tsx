@@ -1,9 +1,8 @@
 "use client"
 import { useParams } from 'next/navigation';
- import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 // import * as THREE from 'three';
 import { Calendar, MapPin, Tag, Star, ChevronLeft, ChevronRight, X } from 'lucide-react';
-import StarryBackground from '@/components/StaryBackground';
 
 interface EventData {
   eventName: string;
@@ -49,7 +48,7 @@ useEffect(() => {
 
     if (galleryRes.success) {
       // If backend returns [{ url: "...", description: "..." }]
-      setGalleryImages(galleryRes.data.map((img: any) => img.url));
+      setGalleryImages(galleryRes.data.map((img: { url: string }) => img.url));
     }
 
   } catch (err) {

@@ -31,10 +31,11 @@ export async function POST(req: NextRequest) {
     ).select("-password -__v");
 
     return NextResponse.json({ success: true, data: user });
-  } catch (err: any) {
-    console.error("Update ProfilePic Error:", err.message);
+  } catch (err: unknown) {
+    console.error("Update ProfilePic Error:", err);
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
     return NextResponse.json(
-      { success: false, message: "Something went wrong", error: err.message },
+      { success: false, message: "Something went wrong", error: errorMessage },
       { status: 500 }
     );
   }
