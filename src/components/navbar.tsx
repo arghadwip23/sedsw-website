@@ -76,7 +76,7 @@ export function Navbar() {
     }, [isMenuOpen]);
 
     return (
-        <div className="menu-container z-50 lg:hidden" ref={container}>
+        <div className="menu-container z-50 lg:hidden backdrop-blur-lg" ref={container}>
             <div className="menu-bar">
                 <div className="menu-logo">
                     <Link href={"/"}>SEDS Antariksh</Link>
@@ -85,7 +85,7 @@ export function Navbar() {
                     <p>Menu</p>
                 </div>
             </div>
-            <div className="menu-overlay">
+            <div className="menu-overlay backdrop-blur-lg">
                 <div className="menu-overlay-bar">
                     <Link href={"/"}>Antariksh</Link>
                     <div className="menu-logo"></div>
