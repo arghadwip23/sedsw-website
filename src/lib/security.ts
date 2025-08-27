@@ -5,7 +5,7 @@ export function verifyOrigin(req: Request): Response | null {
   // Allow frontend (browser) + localhost dev tools
   const allowedOrigins = [
     "http://localhost:3000",
-    "https://sedsantariksh25.netlify.app", // replace with production domain
+    "https://sedsantariksh25.netlify.app/", // replace with production domain
   ];
 
   // ⚠️ If origin is missing (like in Thunder Client/Postman), allow in dev

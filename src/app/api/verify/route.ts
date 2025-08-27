@@ -2,18 +2,18 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import PendingApplicationModel from "@/models/PendingApplicationModel";
 import ApplicationModel from "@/models/ApplicationModel";
-import { verifyOrigin } from "@/lib/security";
+// import { verifyOrigin } from "@/lib/security";
 
 export async function GET(req: Request) {
   try {
     console.log("Verification API called");
     
     // Add security check
-    const authError = verifyOrigin(req);
-    if (authError) {
-      console.log("Origin verification failed:", authError);
-      return authError;
-    }
+    // const authError = verifyOrigin(req);
+    // if (authError) {
+    //   console.log("Origin verification failed:", authError);
+    //   return authError;
+    // }
 
     const { searchParams } = new URL(req.url);
     const token = searchParams.get("token");
@@ -84,8 +84,8 @@ export async function GET(req: Request) {
     // Ensure no legacy unique index on email blocks creation
     try {
       const indexes = await ApplicationModel.collection.indexes();
-      const emailIdx = indexes.find((i: any) => i.name === 'email_1');
-      if (emailIdx && emailIdx.unique) {
+      const emailIdx = indexes.find((i) => i.name === 'email_1');
+      if (emailIdx && 'unique' in emailIdx && emailIdx.unique) {
         console.log('Dropping legacy unique index on email');
         await ApplicationModel.collection.dropIndex('email_1');
       }
@@ -107,11 +107,12 @@ export async function GET(req: Request) {
         verificationToken: null,
       });
       console.log("Created final application:", finalApp._id);
-    } catch (createError: any) {
+    } catch (createError: unknown) {
       console.error("Failed to create final application:", createError);
       // Handle duplicate-key errors gracefully
-      if (createError && createError.code === 11000) {
-        const which = createError.keyPattern ? Object.keys(createError.keyPattern).join(', ') : 'a unique field';
+      if (createError && typeof createError === 'object' && 'code' in createError && createError.code === 11000) {
+        const keyPattern = 'keyPattern' in createError ? createError.keyPattern : null;
+        const which = keyPattern && typeof keyPattern === 'object' ? Object.keys(keyPattern).join(', ') : 'a unique field';
         return new NextResponse(`
           <!DOCTYPE html>
           <html>
@@ -207,8 +208,6 @@ export async function GET(req: Request) {
     // CHANGE LOCALHOST URL HERE
   } catch (error) {
     console.error("Verification error:", error);
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
-                   (req.headers.get("host") ? `http://${req.headers.get("host")}` : "http://localhost:3000");
     return new NextResponse(`
       <html>
         <head><title>Server Error - SEDS</title></head>
