@@ -15,7 +15,7 @@ const menuLinks = [
     { path: "/about", label: "About" },
     { path: "/events", label: "Events" },
     { path: "/projects", label: "Projects" },
-    { path: "/gallery", label: "Gallery" },
+    { path: "/team", label: "Our Team" },
     { path: "/join", label: "Join Us" },
 ];
 

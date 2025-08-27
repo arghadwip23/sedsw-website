@@ -20,12 +20,12 @@ export default function SecondNav() {
     { label: 'About us', href: '/about' },
     { label: 'Event', href: '/events' },
     //{ label: 'Project', href: '/projects' },
-    { label: 'Gallery', href: '/gallery' },
+    { label: 'Our Team', href: '/team' },
     { label: 'Join Us', href: '/join' },
   ];
 
   return (
-    <nav className='justify-between px-10 p-3 hidden lg:flex items-center remove w-full bg-transparent z-[4000]'>
+    <nav className='justify-between px-10 p-3 hidden lg:flex items-center remove w-full bg-transparent backdrop-blur-lg z-[4000]'>
       <Image src={`/logo.svg`} width={65} height={65} alt="logo" />
       <div>
         <ul className='flex gap-7 font-semibold'>
