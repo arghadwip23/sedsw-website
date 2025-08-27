@@ -112,7 +112,7 @@ export default function About() {
                   </div>
                   <div>
                     <p className="text-white/60 text-sm font-medium">Established</p>
-                    <p className="text-white text-lg font-semibold">2021-20XX</p>
+                    <p className="text-white text-lg font-semibold">2021</p>
                   </div>
                 </div>
               </div>

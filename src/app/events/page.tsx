@@ -132,8 +132,10 @@ export default function Events() {
               style={{ width: `${progress}%` }}
             ></div>
           </div>
-          <p className="text-white text-lg">Loading Video...</p>
-          <p className="text-gray-400 text-sm mt-2">{progress}%</p>
+          <p className="text-white text-lg">Loading...</p>
+          <p className="text-gray-400 text-sm mt-2">
+            {progress}%
+          </p>
         </div>
       )}
 

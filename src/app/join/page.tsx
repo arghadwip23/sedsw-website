@@ -111,20 +111,140 @@ const initialFormData: Application = {
   const [showForm, setShowForm] = useState(false);
   const [showThankYou, setShowThankYou] = useState(false);
   const [loading,setLoading] = useState(false);
+  const [verificationSent, setVerificationSent] = useState(false);
+  const [verificationError, setVerificationError] = useState("");
+
+  // Check URL parameters on component mount and when URL changes
+  useEffect(() => {
+    const checkUrlParams = () => {
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        const verified = urlParams.get('verified');
+        const error = urlParams.get('error');
+        
+        console.log("URL params - verified:", verified, "error:", error);
+        console.log("Current URL:", window.location.href);
+        
+        if (verified === '1') {
+          console.log("Setting showThankYou to true");
+          setShowThankYou(true);
+          // Clear the URL parameters
+          window.history.replaceState({}, document.title, window.location.pathname);
+        } else if (verified === '0' && error) {
+          // Handle verification errors
+          let errorMsg = "Verification failed. ";
+          switch (error) {
+            case 'no_token':
+              errorMsg += "No verification token provided.";
+              break;
+            case 'invalid_token':
+              errorMsg += "Invalid or expired verification token.";
+              break;
+            case 'duplicate':
+              errorMsg += "Registration number already exists.";
+              break;
+            case 'server_error':
+              errorMsg += "Server error occurred during verification.";
+              break;
+            default:
+              errorMsg += "Unknown error occurred.";
+          }
+          setVerificationError(errorMsg);
+          console.error(errorMsg);
+        }
+      }
+    };
+
+    // Check on mount
+    checkUrlParams();
+
+    // Listen for URL changes (for when verification redirects back)
+    const handleUrlChange = () => {
+      console.log("URL changed, checking params again");
+      checkUrlParams();
+    };
+
+    // Listen for popstate (back/forward navigation)
+    window.addEventListener('popstate', handleUrlChange);
+    
+    // Also check when the component is focused (in case verification opened in new tab)
+    const handleFocus = () => {
+      console.log("Window focused, checking params");
+      checkUrlParams();
+      // Also check cross-tab signal via localStorage flag
+      try {
+        if (localStorage.getItem('seds_verified') === '1') {
+          setShowThankYou(true);
+          localStorage.removeItem('seds_verified');
+        }
+      } catch (e) {}
+    };
+    
+    window.addEventListener('focus', handleFocus);
+
+    // Listen via BroadcastChannel for cross-tab verification
+    let bc: BroadcastChannel | null = null;
+    try {
+      if ('BroadcastChannel' in window) {
+        bc = new BroadcastChannel('seds_verification');
+        bc.onmessage = (ev) => {
+          if (ev?.data?.verified) {
+            setShowThankYou(true);
+          }
+        };
+      }
+    } catch (e) {}
+
+    // Listen to storage events (in case BroadcastChannel is unavailable)
+    const onStorage = (ev: StorageEvent) => {
+      if (ev.key === 'seds_verified' && ev.newValue === '1') {
+        setShowThankYou(true);
+        try { localStorage.removeItem('seds_verified'); } catch (e) {}
+      }
+    };
+    window.addEventListener('storage', onStorage);
+
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('storage', onStorage);
+      if (bc) {
+        try { bc.close(); } catch (e) {}
+      }
+    };
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleBackToMain = () => {
+    setShowForm(false);
+    setVerificationSent(false);
+    setVerificationError("");
+    setFormData(initialFormData);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
   
     setLoading(true);
-    if (formData. primaryDepartment === formData.secondaryDepartment) {
-      setErrorMessage("Primary and secondary department preferences must be different.");
+    // Clear previous banners so only the latest shows
+    setVerificationSent(false);
+    setVerificationError("");
+    setErrorMessage("");
+    setDeptError("");
+    setRegError("");
+    
+    if (formData.primaryDepartment === formData.secondaryDepartment) {
+      setDeptError("Primary and secondary department preferences must be different.");
+      setVerificationSent(false);
+      setLoading(false);
       return;
-    } else {
-      try {
+    }
+    
+    try {
+      console.log("Submitting form data:", formData);
       const res = await fetch("/api/applications", {
         method: "POST",
         headers: {
@@ -133,28 +253,33 @@ const initialFormData: Application = {
         body: JSON.stringify(formData),
       });
 
+      console.log("Response status:", res.status);
       const data = await res.json();
+      console.log("Response data:", data);
 
       if (res.ok) {
-        //setMessage("✅ Application submitted successfully!");
+        setErrorMessage("");
+        setVerificationError("");
+        setDeptError("");
+        setRegError("");
         setFormData(initialFormData); // reset form
+        setVerificationSent(true);
       } else {
-        setErrorMessage(`❌ Failed: ${data.message || "Something went wrong"}`);
+        setVerificationSent(false);
+        if (res.status === 400 && data.message && data.message.toLowerCase().includes('registration number already exists')) {
+          // Show inline under registration number instead of top banner
+          setRegError("Registration number already registered");
+        } else {
+          setErrorMessage(`❌ Failed: ${data.message || "Something went wrong"}`);
+        }
       }
     } catch (error) {
       console.error("Application submission error:", error);
+      setVerificationSent(false);
       setErrorMessage("❌ Network error. Please try again later.");
     } finally {
       setLoading(false);
-  setShowThankYou(true);
- 
     }
-      setErrorMessage(""); // Clear error if valid
-    }
-    
-    
-  
-
   };
 
   //const [showAlreadyRegistered, setShowAlreadyRegistered] = useState(false);
@@ -162,6 +287,8 @@ const initialFormData: Application = {
   const [showDepartments, setShowDepartments] = useState(false); // Mounted
   const [departmentsVisible, setDepartmentsVisible] = useState(false); // Animated visibility
   const departmentRef = useRef<HTMLDivElement>(null);
+  const [deptError, setDeptError] = useState("");
+  const [regError, setRegError] = useState("");
 
   const scrollToDepartments = () => {
     setShowDepartments(true);
@@ -371,7 +498,7 @@ const initialFormData: Application = {
       ) : (
         <div className="w-full h-full flex items-center justify-center px-6 -mt-10">
             <button
-            onClick={() => setShowForm(false)}
+            onClick={handleBackToMain}
             className="absolute top-6 left-6 flex items-center text-white hover:text-gray-300 transition-colors z-50"
           >
             <svg
@@ -389,6 +516,25 @@ const initialFormData: Application = {
           
           <div className="w-full max-w-4xl">
           <div className="pt-20">
+    {verificationSent && (
+      <div className="mb-4 text-green-400 text-center font-medium p-4 bg-green-500/20 border border-green-500/50 rounded-md">
+        ✅ Verification mail sent to your email. Please check your inbox and click the verification link.
+        
+      </div>
+    )}
+    
+    {verificationError && (
+      <div className="mb-4 text-red-400 text-center font-medium p-4 bg-red-500/20 border border-red-500/50 rounded-md">
+        ❌ {verificationError}
+      </div>
+    )}
+
+    {errorMessage && (
+      <div className="mb-4 text-red-400 text-center font-medium p-4 bg-red-500/20 border border-red-500/50 rounded-md">
+        ❌ {errorMessage}
+      </div>
+    )}
+    
     {/* {showAlreadyRegistered && (
       <div className="text-red-400 text-center mb-4 font-medium">
         You are already registered.
@@ -420,6 +566,11 @@ const initialFormData: Application = {
                     className="w-full p-3 bg-black/40 border border-white/30 text-white rounded-md focus:outline-none focus:border-white/60 transition-colors"
                     placeholder="Enter your registration number"
                   />
+                  {regError && (
+                    <p style={{ color: "red", fontSize: "0.9rem", marginTop: "4px" }}>
+                      {regError}
+                    </p>
+                  )}
                 </div>
               </div>
               
@@ -482,12 +633,11 @@ const initialFormData: Application = {
                   <option value="content">Design & Content</option>
                   <option value="outreach">Outreach</option>
                 </select>
-                {errorMessage && (
-                <p style={{ color: "red", fontSize: "0.9rem", marginTop: "4px" }}>
-                  {errorMessage}
-                </p>
-              )}
-
+                {deptError && (
+                  <p style={{ color: "red", fontSize: "0.9rem", marginTop: "4px" }}>
+                    {deptError}
+                  </p>
+                )}
               </div>
               
               <div>
