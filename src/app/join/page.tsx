@@ -177,7 +177,8 @@ const initialFormData: Application = {
           setShowThankYou(true);
           localStorage.removeItem('seds_verified');
         }
-      } catch (e) {}
+      } catch (e) {console.log(e);
+      }
     };
     
     window.addEventListener('focus', handleFocus);
