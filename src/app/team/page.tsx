@@ -1,6 +1,5 @@
 "use client"
-import React, { useRef, useEffect, useState } from 'react';
-import * as THREE from 'three';
+import React, { useEffect, useState } from 'react';
 import { Crown, Shield, User, Star, Users, Sparkles, Mail, Phone, BookOpen } from 'lucide-react';
 
 // Types
@@ -25,168 +24,28 @@ interface IUser {
 }
 
 const SpaceTeamPage = () => {
-  const mountRef = useRef<HTMLDivElement | null>(null);
-  const sceneRef = useRef<{
-    scene: THREE.Scene;
-    camera: THREE.PerspectiveCamera;
-    renderer: THREE.WebGLRenderer;
-    stars: THREE.Points;
-    shapes: THREE.Mesh[];
-  } | null>(null);
-  const mouseRef = useRef({ x: 0, y: 0 });
   const [teamData, setTeamData] = useState<IUser[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-  const fetchTeamData = async () => {
-    try {
-      const response = await fetch("/api/getuser");
-      const result = await response.json();
+    const fetchTeamData = async () => {
+      try {
+        const response = await fetch("/api/getuser");
+        const result = await response.json();
 
-      if (result.success) {
-        setTeamData(result.data);
-      } else {
-        console.error("API Error:", result.error || result.message);
-      }
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching team data:", error);
-      setLoading(false);
-    }
-  };
-
-  fetchTeamData();
-}, []);
-  // Three.js Scene Setup
-  useEffect(() => {
-    if (!mountRef.current) return;
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    mountRef.current.appendChild(renderer.domElement);
-    
-    // Monochrome starfield
-    const starsGeometry = new THREE.BufferGeometry();
-    const starsCount = 3000;
-    const positions = new Float32Array(starsCount * 3);
-    const sizes = new Float32Array(starsCount);
-    
-    for (let i = 0; i < starsCount; i++) {
-      const i3 = i * 3;
-      positions[i3] = (Math.random() - 0.5) * 2500;
-      positions[i3 + 1] = (Math.random() - 0.5) * 2500;
-      positions[i3 + 2] = (Math.random() - 0.5) * 1500;
-      sizes[i] = Math.random() * 2 + 1;
-    }
-    
-    starsGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    starsGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-    
-    const starsMaterial = new THREE.PointsMaterial({ 
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.8,
-      sizeAttenuation: false
-    });
-    const stars = new THREE.Points(starsGeometry, starsMaterial);
-    scene.add(stars);
-
-    // Floating geometric shapes
-    const shapes: THREE.Mesh[] = [];
-    for (let i = 0; i < 15; i++) {
-      const geometry = Math.random() > 0.5 
-        ? new THREE.BoxGeometry(2, 2, 2)
-        : new THREE.SphereGeometry(1, 16, 16);
-      
-      const material = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
-        transparent: true,
-        opacity: 0.1,
-        wireframe: true
-      });
-      
-      const shape = new THREE.Mesh(geometry, material);
-      shape.position.set(
-        (Math.random() - 0.5) * 200,
-        (Math.random() - 0.5) * 200,
-        (Math.random() - 0.5) * 200
-      );
-      
-      shape.userData = {
-        originalPosition: shape.position.clone(),
-        rotationSpeed: Math.random() * 0.02 + 0.005,
-        floatSpeed: Math.random() * 0.5 + 0.2
-      };
-      
-      scene.add(shape);
-      shapes.push(shape);
-    }
-
-    camera.position.z = 50;
-    sceneRef.current = { scene, camera, renderer, stars, shapes };
-
-    // Mouse movement handler
-    const handleMouseMove = (event: MouseEvent) => {
-      mouseRef.current.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouseRef.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-
-    // Animation loop
-    const animate = () => {
-      requestAnimationFrame(animate);
-      
-      const time = Date.now() * 0.001;
-      const mouse = mouseRef.current;
-      
-      // Camera parallax
-      camera.position.x += (mouse.x * 8 - camera.position.x) * 0.02;
-      camera.position.y += (mouse.y * 8 - camera.position.y) * 0.02;
-      camera.lookAt(0, 0, 0);
-      
-      // Animate stars
-      stars.rotation.y += 0.0003;
-      stars.rotation.x += mouse.x * 0.0001;
-      
-      // Animate shapes
-      shapes.forEach((shape, index) => {
-        const data = shape.userData;
-        shape.position.y = data.originalPosition.y + Math.sin(time * data.floatSpeed + index) * 3;
-        shape.rotation.x += data.rotationSpeed;
-        shape.rotation.y += data.rotationSpeed * 0.7;
-        shape.position.x += mouse.x * 1;
-        shape.position.y += mouse.y * 1;
-      });
-      
-      renderer.render(scene, camera);
-    };
-    animate();
-
-    // Handle resize
-    const handleResize = () => {
-      if (sceneRef.current) {
-        const { camera, renderer } = sceneRef.current;
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        if (result.success) {
+          setTeamData(result.data);
+        } else {
+          console.error("API Error:", result.error || result.message);
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching team data:", error);
+        setLoading(false);
       }
     };
 
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('mousemove', handleMouseMove);
-      if (mountRef.current && renderer.domElement) {
-        mountRef.current.removeChild(renderer.domElement);
-      }
-      renderer.dispose();
-    };
+    fetchTeamData();
   }, []);
 
   // Helper functions
@@ -262,10 +121,7 @@ const SpaceTeamPage = () => {
 
   return (
     <div className="relative min-h-screen bg-black text-white overflow-hidden">
-      {/* Three.js Background */}
-      <div ref={mountRef} className="fixed inset-0 z-0" />
-      
-      {/* Content Overlay */}
+      {/* Content */}
       <div className="relative z-10 min-h-screen">
         
         {/* Header Section */}
@@ -281,7 +137,7 @@ const SpaceTeamPage = () => {
               SPACE <span className="font-light">TEAM</span>
             </h1>
             
-            <div className="w-32 h-px bg-gradient-to-r from-transparent via-white to-transparent mx-auto mb-8"></div>
+            <div className="w-32 h-px mx-auto mb-8"></div>
             
             <p className="text-xl md:text-2xl font-light text-gray-300 max-w-3xl mx-auto leading-relaxed">
               Meet the cosmic crew navigating through the infinite possibilities of space exploration and technology
@@ -298,7 +154,7 @@ const SpaceTeamPage = () => {
         </header>
 
         {/* Team Grid */}
-        <section className="py-16 px-4">
+        <section className="py-16 px-4 bg-zinc-900">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {sortedTeamData.map((member, index) => (
