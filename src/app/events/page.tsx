@@ -153,7 +153,7 @@ export default function Events() {
       </div>
 
       <div className="flex flex-col z-2 -mt-30">
-        <h1 className="text-3xl font-bold text-white md:mb-16 md:self-end md:pr-36 md:text-left text-center mb-8">
+        <h1 className="text-3xl font-bold text-white md:mb-16 md:pr-36 md:text-left md:pl-24 text-center mb-8">
           Our Events
         </h1>
         <div className="relative w-full">
@@ -179,7 +179,7 @@ export default function Events() {
                     spotlightColor="rgba(255, 255, 255, 0.4)"
                   >
                     <div className="flex flex-col gap-2 p-4">
-                      <h2 className="text-xl font-bold">{event.eventName}</h2>
+                      <h2 className="text-white text-xl font-bold">{event.eventName}</h2>
                       <div className="w-full h-px bg-white/20 my-2" />
                       <p className="text-sm text-gray-300">
                         <span>{event.location}</span>
