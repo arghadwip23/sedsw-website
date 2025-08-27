@@ -25,8 +25,8 @@ export default function SecondNav() {
   ];
 
   return (
-    <nav className='justify-between px-10 p-3 hidden lg:flex items-center remove w-full bg-transparent backdrop-blur-xl z-[4000]'>
-      <Image src={`/logo.svg`} width={65} height={65} alt="logo" />
+    <nav className='fixed top-4 left-1/2 transform -translate-x-1/2 w-[calc(100%-2rem)] hidden lg:flex items-center justify-between px-8 py-4 bg-black/10 backdrop-blur-xl rounded-2xl z-[4000] shadow-2xl'>
+      <Image src={`/logo.svg`} width={45} height={45} alt="logo" />
       <div>
         <ul className='flex gap-7 font-semibold'>
           {elements.map((element, index) => (
@@ -43,17 +43,6 @@ export default function SecondNav() {
           ))}
         </ul>
       </div>
-      {/* <div className='relative'>
-      
-        <input
-          type="text"
-          placeholder='search here'
-          className='border rounded-md p-2 pr-10'
-        />
-        <button className='absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer'>
-          <Search />
-        </button>
-      </div> */}
     </nav>
   );
 }
