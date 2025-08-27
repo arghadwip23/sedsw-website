@@ -25,7 +25,7 @@ export default function SecondNav() {
   ];
 
   return (
-    <nav className='fixed top-4 left-1/2 transform -translate-x-1/2 w-[calc(100%-2rem)] hidden lg:flex items-center justify-between px-8 py-4 bg-black/10 backdrop-blur-xl rounded-2xl z-[4000] shadow-2xl'>
+    <nav className='fixed top-4 left-1/2 transform -translate-x-1/2 w-[calc(100%-10rem)] hidden lg:flex items-center justify-between px-8 py-4 bg-black/10 backdrop-blur-xl rounded-2xl z-[4000] shadow-2xl'>
       <Image src={`/logo.svg`} width={45} height={45} alt="logo" />
       <div>
         <ul className='flex gap-7 font-semibold'>
