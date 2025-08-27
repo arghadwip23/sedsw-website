@@ -269,7 +269,7 @@ const SpaceTeamPage = () => {
       <div className="relative z-10 min-h-screen">
         
         {/* Header Section */}
-        <header className="text-center py-20 px-4">
+        <header className="bg-black text-center py-20 px-4">
           <div className="max-w-6xl mx-auto">
             <div className="mb-8">
               <div className="inline-block p-4 border-2 border-white/20 rounded-full mb-6 backdrop-blur-sm bg-black/20">
