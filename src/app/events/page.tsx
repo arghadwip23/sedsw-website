@@ -153,7 +153,7 @@ export default function Events() {
       </div>
 
       <div className="flex flex-col z-2 -mt-30">
-        <h1 className="text-3xl font-bold text-white md:mb-16 md:self-end md:pr-36 md:text-right text-center mb-8">
+        <h1 className="text-3xl font-bold text-white md:mb-16 md:self-end md:pr-36 md:text-left text-center mb-8">
           Our Events
         </h1>
         <div className="relative w-full">
@@ -175,7 +175,7 @@ export default function Events() {
                   style={{ minWidth: 320, maxWidth: 340 }}
                 ><Link href={`/events/${event._id}`}>
                   <SpotlightCard
-                    className="custom-spotlight-card w-full"
+                    className="custom-spotlight-card w-full rounded-xl"
                     spotlightColor="rgba(255, 255, 255, 0.4)"
                   >
                     <div className="flex flex-col gap-2 p-4">

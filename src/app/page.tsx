@@ -74,8 +74,8 @@ export default function Home() {
 
       <div className={`w-full h-full z-0 flex flex-col justify-center gap-40 transition-opacity duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
         <div className="pl-10">
-          <p className="text-2xl">Welcome to</p>
-          <h1 className="text-5xl font-extrabold">SEDS ANTARIKSH</h1>
+          <p className="text-white text-2xl">Welcome to</p>
+          <h1 className="text-white text-5xl font-extrabold">SEDS ANTARIKSH</h1>
         </div>
         <div className="pl-10 flex items-center align-middle">
           <Link

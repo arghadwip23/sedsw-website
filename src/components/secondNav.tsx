@@ -25,7 +25,7 @@ export default function SecondNav() {
   ];
 
   return (
-    <nav className='justify-between px-10 p-3 hidden lg:flex items-center remove w-full bg-transparent backdrop-blur-lg z-[4000]'>
+    <nav className='justify-between px-10 p-3 hidden lg:flex items-center remove w-full bg-transparent z-[4000]'>
       <Image src={`/logo.svg`} width={65} height={65} alt="logo" />
       <div>
         <ul className='flex gap-7 font-semibold'>
@@ -33,7 +33,7 @@ export default function SecondNav() {
             <li key={index} className='text-[20px]'>
               <Link
                 href={element.href}
-                className={`hover:text-gray-500 pb-1 border-b-2 transition-all ${
+                className={`hover:text-gray-300 text-white pb-1 border-b-2 transition-all ${
                   pathname === element.href ? 'border-white hover:border-gray-500' : 'border-transparent'
                 }`}
               >
