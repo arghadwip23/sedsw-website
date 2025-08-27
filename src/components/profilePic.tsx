@@ -43,52 +43,37 @@ export default function ProfileCard() {
 
   // ✅ Upload new profile picture
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const file = e.target.files?.[0];
+  if (!file) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "ml_default"); // Replace with your Cloudinary preset
-    formData.append("folder", "profiles");
+  const formData = new FormData();
+  formData.append("file", file);
 
-    try {
-      setUploading(true);
-      toast.loading("Uploading...", { id: "upload" });
+  try {
+    setUploading(true);
+    toast.loading("Uploading...", { id: "upload" });
 
-      // Upload to Cloudinary
-      const uploadRes = await fetch(
-        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-      const uploadData = await uploadRes.json();
+    // ✅ Directly send file to backend
+    const updateRes = await fetch("/api/user/updateProfilePic", {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    });
 
-      if (!uploadRes.ok) throw new Error(uploadData.error?.message || "Upload failed");
-
-      // ✅ Save URL to backend
-      const updateRes = await fetch("/api/user/updateProfilePic", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ profilePicture: uploadData.secure_url }),
-      });
-
-      const updateData = await updateRes.json();
-      if (updateData.success) {
-        setUser(updateData.data);
-        toast.success("Profile picture updated!", { id: "upload" });
-      } else {
-        throw new Error(updateData.message);
-      }
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Upload failed';
-      toast.error(errorMessage, { id: "upload" });
-    } finally {
-      setUploading(false);
+    const updateData = await updateRes.json();
+    if (updateData.success) {
+      setUser(updateData.data);
+      toast.success("Profile picture updated!", { id: "upload" });
+    } else {
+      throw new Error(updateData.message);
     }
-  };
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Upload failed";
+    toast.error(errorMessage, { id: "upload" });
+  } finally {
+    setUploading(false);
+  }
+};
 
   if (loading) return <p className="text-center text-gray-500">Loading profile...</p>;
   if (!user) return <p className="text-center text-red-500">User not found</p>;

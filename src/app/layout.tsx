@@ -32,9 +32,21 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black`}
       >
-        <Navbar />
-        <SecondNav/>
-        {children}
+       {/* Mobile Navbar */}
+        <div className="fixed top-0 left-0 w-full z-[4000] flex lg:hidden">
+          <Navbar />
+        </div>
+
+        {/* Desktop Navbar */}
+        <div className="fixed top-0 left-0 w-full z-[4000] hidden lg:flex">
+          <SecondNav />
+        </div>
+
+        {/* Page Content with padding to avoid overlap */}
+        <main className="pt-20"> 
+          {children}
+        </main>
+        {/* {children} */}
       </body>
     </html>
   );

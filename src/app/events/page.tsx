@@ -237,7 +237,7 @@ export default function Events() {
       </div>
       {/* Next Page Button */}
       <Link
-        href="/gallery"
+        href="/team"
         className="fixed bottom-8 right-8 z-30 px-6 py-3 bg-white text-black font-semibold shadow-lg transition-all duration-300 ease-out
           hover:bg-black hover:text-white hover:scale-105 group flex items-center gap-2"
       >

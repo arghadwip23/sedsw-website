@@ -45,7 +45,7 @@ export async function POST(req: Request) {
       password,
       orgRole:orgRole|| "member", // enforce defaults
       department: department||{ name: "", role: "none", isInRole: false },
-      profilePicture:profilePicture||"https://example.com",
+      profilePicture:profilePicture||"https://res.cloudinary.com/dpbjhiguv/image/upload/v1756234445/gallery/vif3hrmdqfkjc1jfmho5.jpg",
       isAdmin: false,
     });
 
