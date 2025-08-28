@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
+import connectDB from "@/lib/mongodb";
 import users from "@/models/User"; // adjust path
 import { ApiResponse } from "@/types/response"; // wherever you put ApiResponse
 
 export async function GET() {
   try {
-    // Fetch users from the database and strip out password field
-    const userDocs = await users.find().lean();
+    // Connect to database first
+    await connectDB();
+    
+    // Fetch users from the database with timeout and strip out password field
+    const userDocs = await users.find().lean().maxTimeMS(8000); // 8 second timeout
     const safeUsers = userDocs.map((user) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...rest } = user;

@@ -194,13 +194,17 @@ const initialFormData: Application = {
           }
         };
       }
-    } catch (e) {}
+    } catch {
+      // Ignore BroadcastChannel errors
+    }
 
     // Listen to storage events (in case BroadcastChannel is unavailable)
     const onStorage = (ev: StorageEvent) => {
       if (ev.key === 'seds_verified' && ev.newValue === '1') {
         setShowThankYou(true);
-        try { localStorage.removeItem('seds_verified'); } catch (e) {}
+        try { localStorage.removeItem('seds_verified'); } catch {
+          // Ignore localStorage errors
+        }
       }
     };
     window.addEventListener('storage', onStorage);
@@ -210,7 +214,9 @@ const initialFormData: Application = {
       window.removeEventListener('focus', handleFocus);
       window.removeEventListener('storage', onStorage);
       if (bc) {
-        try { bc.close(); } catch (e) {}
+        try { bc.close(); } catch {
+          // Ignore close errors
+        }
       }
     };
   }, []);

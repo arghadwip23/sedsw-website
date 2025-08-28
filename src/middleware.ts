@@ -2,7 +2,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import * as jose from "jose";
 
-const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
+const JWT_SECRET = process.env.JWT_SECRET ;
 
 // Paths where auth is not required
 const PUBLIC_PATHS = ["/login", "/signup", "/api/auth/login", "/api/auth/signup", "/"];
