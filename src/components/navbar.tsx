@@ -8,13 +8,10 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import DecryptedText from '../../TextAnimations/DecryptedText/DecryptedText';
 
-
-
 const menuLinks = [
     { path: "/", label: "Home" },
     { path: "/about", label: "About" },
     { path: "/events", label: "Events" },
-    { path: "/projects", label: "Projects" },
     { path: "/team", label: "Our Team" },
     { path: "/join", label: "Join Us" },
 ];
@@ -76,7 +73,7 @@ export function Navbar() {
     }, [isMenuOpen]);
 
     return (
-        <div className="menu-container z-50 lg:hidden backdrop-blur-lg" ref={container}>
+        <div className="menu-container z-50" ref={container}>
             <div className="menu-bar">
                 <div className="menu-logo">
                     <Link href={"/"}>SEDS Antariksh</Link>
@@ -85,9 +82,9 @@ export function Navbar() {
                     <p>Menu</p>
                 </div>
             </div>
-            <div className="menu-overlay backdrop-blur-lg">
+            <div className="menu-overlay">
                 <div className="menu-overlay-bar">
-                    <Link href={"/"}>Antariksh</Link>
+                    <Link href={"/"}>SEDS Antariksh</Link>
                     <div className="menu-logo"></div>
                     <div className="menu-close" onClick={toggleMenu}>
                         <p>Close</p>
