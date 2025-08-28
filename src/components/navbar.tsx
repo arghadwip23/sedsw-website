@@ -113,12 +113,12 @@ export function Navbar() {
                     </div>
                     <div className="menu-info">
                         <div className="menu-info-col">
-                            <a href='#'>Instagram &#8599;</a>
-                            <a href='#'>Medium &#8599;</a>
-                            <a href='#'>Twitter &#8599;</a>
+                            <a href='https://www.instagram.com/seds_antariksh/'>Instagram &#8599;</a>
+                            <a href='https://medium.com/@sedsantariksh'>Medium &#8599;</a>
+                            <a href='https://in.linkedin.com/company/seds-antariksh-vitc'>LinkedIn &#8599;</a>
                         </div>
                         <div className="menu-info-col">
-                            <p>info@antariksh.com</p>
+                            <p>sedsantariksh@gmail.com</p>
                             <p>VIT Chennai</p>
                         </div>
                     </div>

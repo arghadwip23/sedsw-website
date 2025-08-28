@@ -29,6 +29,7 @@
     width: 100vw;
     height: 100vh;
     padding: 2em;
+    padding-bottom: 4em;
     background: transparent;
     backdrop-filter: blur(32px) brightness(60%);
     z-index: 2;
