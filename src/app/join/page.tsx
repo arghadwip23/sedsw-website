@@ -475,7 +475,7 @@ const initialFormData: Application = {
             <h3 className="text-xl font-bold text-white group-hover:text-white/80 transition-colors duration-300">Projects</h3>
           </div>
           <p className="text-white/80 leading-relaxed group-hover:text-white transition-colors duration-300 text-sm">
-            The Projects team brings innovation to life. Here, members get the opportunity to work on real-world, space-related projects — from building models and simulations to designing space-tech concepts. It's a space to explore, experiment, and turn ideas into impactful solutions.
+            The Projects team brings innovation to life. Here, members get the opportunity to work on real-world, space-related projects — from building models and simulations to designing space-tech concepts. It&apos;s a space to explore, experiment, and turn ideas into impactful solutions.
           </p>
           <div className="absolute inset-0 bg-white/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
         </motion.div>
@@ -513,7 +513,7 @@ const initialFormData: Application = {
             <h3 className="text-xl font-bold text-white group-hover:text-white/80 transition-colors duration-300">Design & Content</h3>
           </div>
           <p className="text-white/80 leading-relaxed group-hover:text-white transition-colors duration-300 text-sm">
-            The Content & Design team tells the SEDS story in the most creative ways possible. Whether it's writing compelling blogs, crafting engaging social media posts, producing YouTube videos, or designing eye-catching visuals, we turn ideas into captivating content.
+            The Content & Design team tells the SEDS story in the most creative ways possible. Whether it&apos;s writing compelling blogs, crafting engaging social media posts, producing YouTube videos, or designing eye-catching visuals, we turn ideas into captivating content.
           </p>
           <div className="absolute inset-0 bg-white/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
         </motion.div>

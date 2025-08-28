@@ -1,6 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { Crown, Shield, User, Star, Users, Sparkles, Mail, Phone, BookOpen } from 'lucide-react';
+import Galaxy from '../../../Backgrounds/Galaxy/Galaxy';
 
 // Types
 type OrgRole = "president" | "vice-president" | "secretary" | "treasurer" | "member";
@@ -120,12 +121,23 @@ const SpaceTeamPage = () => {
   }
 
   return (
-    <div className="relative min-h-screen bg-black text-white overflow-hidden">
+    <div className="relative min-h-screen bg-transparent text-white overflow-hidden">
+      {/* Galaxy Background */}
+      <div className="fixed inset-0 z-0">
+        <Galaxy 
+          mouseRepulsion={true}
+          mouseInteraction={true}
+          density={1.5}
+          glowIntensity={0.5}
+          saturation={.5}
+          hueShift={150}
+        />
+      </div>
       {/* Content */}
       <div className="relative z-10 min-h-screen">
         
         {/* Header Section */}
-        <header className="bg-black text-center py-20 px-4">
+        <header className="bg-transparent text-center py-20 px-4">
           <div className="max-w-6xl mx-auto">
             <div className="mb-8">
               <div className="inline-block p-4 border-2 border-white/20 rounded-full mb-6 backdrop-blur-sm bg-black/20">
