@@ -74,7 +74,7 @@ export function Navbar() {
 
     return (
         <div className="menu-container z-50" ref={container}>
-            <div className="menu-bar">
+            <div className="menu-bar backdrop-blur-2xl">
                 <div className="menu-logo">
                     <Link href={"/"}>SEDS Antariksh</Link>
                 </div>

@@ -43,7 +43,7 @@ const GalaxyBackground: React.FC = () => {
     "/models/galaxy.glb",
     (gltf) => {
       galaxy = gltf.scene;
-      galaxy.scale.set(5, 5, 5);
+      galaxy.scale.set(3, 3, 3);
 
       const box = new THREE.Box3().setFromObject(galaxy);
       const center = new THREE.Vector3();
@@ -547,7 +547,7 @@ const initialFormData: Application = {
         <div className="relative z-10 w-full h-full flex items-center justify-center px-6 -mt-10">
           <div className="w-full max-w-4xl">
             {/* Back Button above the form */}
-            <div className="flex justify-start">
+            <div className="flex justify-start pt-24 pb-0">
               <button
                 onClick={handleBackToMain}
                 className="flex items-center text-white hover:text-gray-300 transition-colors"
@@ -565,7 +565,7 @@ const initialFormData: Application = {
                 <span className="text-sm md:text-base">Back</span>
               </button>
             </div>
-            <div className="pt-10">
+            <div className="pt-4">
     {verificationSent && (
       <div className="mb-4 text-green-400 text-center font-medium p-4 bg-green-500/20 border border-green-500/50 rounded-md">
         ✅ Verification mail sent to your email. Please check your inbox and click the verification link.
