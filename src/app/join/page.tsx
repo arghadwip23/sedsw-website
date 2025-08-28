@@ -89,7 +89,7 @@ const GalaxyBackground: React.FC = () => {
   return (
     <div
       ref={mountRef}
-      className="fixed top-0 left-0 w-full h-screen -z-[9999]"
+      className="fixed top-0 left-0 w-full h-screen z-0"
       style={{ pointerEvents: "none" }}
     />
   );
@@ -328,7 +328,7 @@ const initialFormData: Application = {
 
   if (showThankYou) {
     return (
-      <div className="relative w-full h-screen flex items-center justify-center bg-black/40">
+      <div className="relative w-full h-screen bg-transparent flex items-center justify-center">
         <GalaxyBackground />
         <div className="flex flex-col items-center justify-center text-center px-6 -mt-25">
           <BlurText
@@ -370,12 +370,12 @@ const initialFormData: Application = {
   
 
   return (
-    <div className="relative w-full h-screen flex items-center justify-center bg-black/40">
+    <div className="relative w-full h-screen flex items-center bg-black justify-center">
       <GalaxyBackground />
       
 
       {!showForm ? (
-        <div className="flex flex-col items-center justify-start pt-35 h-full w-full px-6 md:px-16">
+        <div className="relative z-10 flex flex-col items-center justify-start pt-35 h-full w-full px-6 md:px-16">
           <div className="max-w-4xl w-full">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-12">
               <div className="flex-1">
@@ -497,7 +497,7 @@ const initialFormData: Application = {
 
         </div>
       ) : (
-        <div className="w-full h-full flex items-center justify-center px-6 -mt-10">
+        <div className="relative z-10 w-full h-full flex items-center justify-center px-6 -mt-10">
             <button
             onClick={handleBackToMain}
             className="absolute top-6 left-6 flex items-center text-white hover:text-gray-300 transition-colors z-50"
