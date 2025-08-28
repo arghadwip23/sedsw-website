@@ -120,9 +120,9 @@ const SpaceTeamPage = () => {
   }
 
   return (
-    <div className="relative min-h-screen bg-black text-white overflow-hidden" style={{ backgroundColor: '#000000' }}>
+    <div className="relative min-h-screen bg-black text-white overflow-hidden">
       {/* Content */}
-      <div className="relative z-10 min-h-screen bg-black">
+      <div className="relative z-10 min-h-screen">
         
         {/* Header Section */}
         <header className="bg-black text-center py-20 px-4">
