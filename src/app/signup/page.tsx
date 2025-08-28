@@ -36,7 +36,7 @@ const SignupPage = () => {
       isInRole: false
     },
     orgRole: 'member',
-    profilePicture: 'https://example.com'
+    profilePicture: "https://res.cloudinary.com/dpbjhiguv/image/upload/v1756234445/gallery/vif3hrmdqfkjc1jfmho5.jpg"
   });
 
   const [showPassword, setShowPassword] = useState(false);

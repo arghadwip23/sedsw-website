@@ -63,9 +63,9 @@ export async function POST(req: Request) {
 
       try {
         await resend.emails.send({
-          from: "noreply@baujikapaisa.in",
+          from: "noreply@sedsantariksh.com",
           to: body.email,
-          subject: "Verify your email",
+          subject: "Verify your application",
           html: verificationEmailTemplate(body.fullName, verifyUrl),
         });
         console.log("Verification email re-sent successfully");
