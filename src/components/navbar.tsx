@@ -8,13 +8,10 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import DecryptedText from '../../TextAnimations/DecryptedText/DecryptedText';
 
-
-
 const menuLinks = [
     { path: "/", label: "Home" },
     { path: "/about", label: "About" },
     { path: "/events", label: "Events" },
-    { path: "/projects", label: "Projects" },
     { path: "/team", label: "Our Team" },
     { path: "/join", label: "Join Us" },
 ];
@@ -76,8 +73,8 @@ export function Navbar() {
     }, [isMenuOpen]);
 
     return (
-        <div className="menu-container z-50 lg:hidden backdrop-blur-lg" ref={container}>
-            <div className="menu-bar">
+        <div className="menu-container z-50" ref={container}>
+            <div className="menu-bar backdrop-blur-2xl">
                 <div className="menu-logo">
                     <Link href={"/"}>SEDS Antariksh</Link>
                 </div>
@@ -85,9 +82,9 @@ export function Navbar() {
                     <p>Menu</p>
                 </div>
             </div>
-            <div className="menu-overlay backdrop-blur-lg">
+            <div className="menu-overlay">
                 <div className="menu-overlay-bar">
-                    <Link href={"/"}>Antariksh</Link>
+                    <Link href={"/"}>SEDS Antariksh</Link>
                     <div className="menu-logo"></div>
                     <div className="menu-close" onClick={toggleMenu}>
                         <p>Close</p>
@@ -116,12 +113,12 @@ export function Navbar() {
                     </div>
                     <div className="menu-info">
                         <div className="menu-info-col">
-                            <a href='#'>Instagram &#8599;</a>
-                            <a href='#'>Medium &#8599;</a>
-                            <a href='#'>Twitter &#8599;</a>
+                            <a href='https://www.instagram.com/seds_antariksh/'>Instagram &#8599;</a>
+                            <a href='https://medium.com/@sedsantariksh'>Medium &#8599;</a>
+                            <a href='https://in.linkedin.com/company/seds-antariksh-vitc'>LinkedIn &#8599;</a>
                         </div>
                         <div className="menu-info-col">
-                            <p>info@antariksh.com</p>
+                            <p>sedsantariksh@gmail.com</p>
                             <p>VIT Chennai</p>
                         </div>
                     </div>

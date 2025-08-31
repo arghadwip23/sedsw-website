@@ -1,6 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { Crown, Shield, User, Star, Users, Sparkles, Mail, Phone, BookOpen } from 'lucide-react';
+import Galaxy from '../../../Backgrounds/Galaxy/Galaxy';
 
 // Types
 type OrgRole =
@@ -120,12 +121,23 @@ const SpaceTeamPage = () => {
   }
 
   return (
-    <div className="relative min-h-screen bg-black text-white overflow-hidden">
+    <div className="relative min-h-screen bg-transparent text-white overflow-hidden">
       {/* Content */}
       <div className="relative z-10 min-h-screen">
         
         {/* Header Section */}
-        <header className="bg-black text-center py-20 px-4">
+        <header className="bg-transparent text-center py-20 px-4">
+                <div className="fixed inset-0 z-0">
+        <Galaxy 
+          mouseRepulsion={true}
+          mouseInteraction={true}
+          density={1.5}
+          glowIntensity={0.5}
+          saturation={.5}
+          repulsionStrength={.2}
+          hueShift={200}
+        />
+      </div>
           <div className="max-w-6xl mx-auto">
             <div className="mb-8">
               <div className="inline-block p-4 border-2 border-white/20 rounded-full mb-6 backdrop-blur-sm bg-black/20">
@@ -133,7 +145,7 @@ const SpaceTeamPage = () => {
               </div>
             </div>
             
-            <h1 className="text-6xl md:text-8xl font-thin mb-6 tracking-wider">
+            <h1 className="text-6xl md:text-8xl font-thin mb-6 tracking-wider z-10">
               SPACE <span className="font-light">TEAM</span>
             </h1>
             
@@ -154,7 +166,7 @@ const SpaceTeamPage = () => {
         </header>
 
         {/* Team Grid */}
-        <section className="py-16 px-4 bg-zinc-900">
+        <section className="py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {sortedTeamData.map((member, index) => (

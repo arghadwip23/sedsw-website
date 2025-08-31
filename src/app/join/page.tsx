@@ -43,7 +43,7 @@ const GalaxyBackground: React.FC = () => {
     "/models/galaxy.glb",
     (gltf) => {
       galaxy = gltf.scene;
-      galaxy.scale.set(2, 2, 2);
+      galaxy.scale.set(3, 3, 3);
 
       const box = new THREE.Box3().setFromObject(galaxy);
       const center = new THREE.Vector3();
@@ -89,7 +89,7 @@ const GalaxyBackground: React.FC = () => {
   return (
     <div
       ref={mountRef}
-      className="fixed top-0 left-0 w-full h-screen -z-[9999]"
+      className="fixed top-0 left-0 w-full h-screen z-0"
       style={{ pointerEvents: "none" }}
     />
   );
@@ -305,16 +305,12 @@ const initialFormData: Application = {
     }, 100); // slight delay for smoother scroll
   };
   
-  
-
   useEffect(() => {
     
     if (showDepartments && departmentRef.current) {
       departmentRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [showDepartments]);
-  
-  
   
   const scrollToTop = () => {
     // Immediately scroll up a bit to trigger a proper visual transition
@@ -334,7 +330,7 @@ const initialFormData: Application = {
 
   if (showThankYou) {
     return (
-      <div className="relative w-full h-screen flex items-center justify-center bg-black/40">
+      <div className="relative w-full h-screen bg-transparent flex items-center justify-center">
         <GalaxyBackground />
         <div className="flex flex-col items-center justify-center text-center px-6 -mt-25">
           <BlurText
@@ -370,40 +366,35 @@ const initialFormData: Application = {
       </div>
     );
   }
-  
-  
-  
-  
 
   return (
-    <div className="relative w-full h-screen flex items-center justify-center bg-black/40">
+    <div className="relative w-full h-screen flex items-center bg-black justify-center">
       <GalaxyBackground />
       
 
       {!showForm ? (
-        <div className="flex flex-col items-center justify-start pt-35 h-full w-full px-6 md:px-16">
-          <div className="max-w-4xl w-full">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-12">
-              <div className="flex-1">
-                <BlurText
-                  text="Join Us"
-                  delay={150}
-                  animateBy="words"
-                  direction="top"
-                  className="text-5xl md:text-6xl font-bold text-white mb-6"
-                />
-                <BlurText
-                  text="From hands-on technical projects to thought-provoking space talks and outreach initiatives, we aim to foster curiosity and inspire the next generation of changemakers. Whether you're a beginner or an experienced space nerd, there's always a place for you here. Ready to launch your journey with us? Fill up the details below and our team will reach out to you"
-                  delay={20}
-                  animateBy="words"
-                  direction="top"
-                  className="text-lg md:text-xl text-white/80 max-w-2xl leading-relaxed"
-                />
-              </div>
-              <div className="flex justify-center md:justify-end mt-8 md:mt-0 md:ml-12">
+        <div className="relative z-10 flex flex-col items-center justify-center h-full w-full px-6 md:px-16">
+          <div className="max-w-4xl w-full text-center">
+            <div className="backdrop-blur-xl bg-transparent rounded-3xl p-8 md:p-12 mb-12">
+              <BlurText
+                text="Join Us"
+                delay={150}
+                animateBy="words"
+                direction="top"
+                className="text-5xl md:text-6xl font-bold text-white mb-8"
+              />
+              
+              <BlurText
+                text="From hands-on technical projects to thought-provoking space talks and outreach initiatives, we aim to foster curiosity and inspire the next generation of changemakers. Whether you're a beginner or an experienced space nerd, there's always a place for you here. Ready to launch your journey with us? Fill up the details below and our team will reach out to you."
+                delay={20}
+                animateBy="words"
+                direction="top"
+                className="text-lg md:text-xl text-white/90 leading-relaxed mb-10 max-w-3xl mx-auto"
+              />
+              <div className="flex md:justify-left md:pl-4">
                 <button
                   onClick={() => setShowForm(true)}
-                  className="h-16 px-8 border border-white bg-black text-white font-semibold text-xl transition-all duration-300 ease-in-out hover:bg-white hover:text-black hover:scale-105 active:scale-95 mt-20"
+                  className="h-16 px-8 border border-white bg-black text-white font-semibold text-xl transition-all duration-300 ease-in-out hover:bg-white hover:text-black hover:scale-105 active:scale-95"
                 >
                   Apply Now
                 </button>
@@ -437,8 +428,6 @@ const initialFormData: Application = {
   </div>
 )}
 
-
-
 <AnimatePresence>
 {showDepartments && (
     <motion.div
@@ -446,83 +435,137 @@ const initialFormData: Application = {
       initial={{ opacity: 0, y: 50 }}
       animate={departmentsVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
       exit={{ opacity: 0, y: 50 }}
-      transition={{ duration: 1.2, ease: "easeInOut" }}
+      transition={{ duration: .5, ease: "easeInOut" }}
       ref={departmentRef}
-      className="w-full text-white px-6 py-10 backdrop-blur-md border-t border-white/20"
-      style={{ background: "transparent" }}
+      className="absolute bottom-0 left-0 right-0 w-full text-white px-4 md:px-6 py-6 backdrop-blur-xl bg-black/40 border-t border-white/20 max-h-[75vh] overflow-y-auto"
     >
-
-
-    {/* Top Up Arrow */}
-    <div className="w-full flex justify-center mb-8">
-      <button
-        onClick={scrollToTop}
-        className="animate-bounce focus:outline-none"
-        aria-label="Hide Departments"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-8 w-8 text-white rotate-180 transition-transform duration-300"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
+      {/* Top Up Arrow */}
+      <div className="w-full flex justify-center mb-6">
+        <button
+          onClick={scrollToTop}
+          className="animate-bounce focus:outline-none"
+          aria-label="Hide Departments"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-    </div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 text-white rotate-180 transition-transform duration-300"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
 
-              {/* Department content stays same */}
-              <div className="max-w-4xl mx-auto space-y-4 text-sm md:text-base leading-relaxed">
-               <div>
-  <strong>🚀 Projects:<br/></strong> 
-  The Projects team brings innovation to life. Here, members get the opportunity to work on real-world, space-related projects — from building models and simulations to designing space-tech concepts. It&apos;s a space to explore, experiment, and turn ideas into impactful solutions. If you&apos;re someone who loves solving problems and thinking creatively, this is where your skills will shine.
-</div>
+      {/* Department Cards Grid */}
+      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 pb-4">
+        {/* Projects Card */}
+        <motion.div
+          initial={{ opacity: 0, x: -50 }}
+          animate={departmentsVisible ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
+          transition={{ duration: 0.8, delay: 0.1 }}
+          className="group relative backdrop-blur-xl bg-black/20 border border-white/20 rounded-xl p-5 hover:bg-black/30 hover:border-white/40 transition-all duration-500 hover:scale-[1.02] hover:shadow-xl hover:shadow-white/10"
+        >
+          <div className="flex items-center mb-3">
+            <div className="w-10 h-10 bg-white/10 border border-white/20 rounded-full flex items-center justify-center mr-3 group-hover:scale-110 transition-transform duration-300">
+              <span className="text-lg">🚀</span>
+            </div>
+            <h3 className="text-xl font-bold text-white group-hover:text-white/80 transition-colors duration-300">Projects</h3>
+          </div>
+          <p className="text-white/80 leading-relaxed group-hover:text-white transition-colors duration-300 text-sm">
+            The Projects team brings innovation to life. Here, members get the opportunity to work on real-world, space-related projects — from building models and simulations to designing space-tech concepts. It&apos;s a space to explore, experiment, and turn ideas into impactful solutions.
+          </p>
+          <div className="absolute inset-0 bg-white/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        </motion.div>
 
-<div>
-  <strong>🎉 Events:<br/></strong> 
-  The Events team keeps the SEDS spirit alive! From magical stargazing nights to challenging hackathons and hands-on workshops, they are the ones behind every unforgettable experience. They plan, organize, and execute events that bring together and build a strong community. If you enjoy bringing people together and creating memorable moments, Events is your home.
-</div>
+        {/* Events Card */}
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          animate={departmentsVisible ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="group relative backdrop-blur-xl bg-black/20 border border-white/20 rounded-xl p-5 hover:bg-black/30 hover:border-white/40 transition-all duration-500 hover:scale-[1.02] hover:shadow-xl hover:shadow-white/10"
+        >
+          <div className="flex items-center mb-3">
+            <div className="w-10 h-10 bg-white/10 border border-white/20 rounded-full flex items-center justify-center mr-3 group-hover:scale-110 transition-transform duration-300">
+              <span className="text-lg">🎉</span>
+            </div>
+            <h3 className="text-xl font-bold text-white group-hover:text-white/80 transition-colors duration-300">Events</h3>
+          </div>
+          <p className="text-white/80 leading-relaxed group-hover:text-white transition-colors duration-300 text-sm">
+            The Events team keeps the SEDS spirit alive! From magical stargazing nights to challenging hackathons and hands-on workshops, they are the ones behind every unforgettable experience. They plan, organize, and execute events that bring together and build a strong community.
+          </p>
+          <div className="absolute inset-0 bg-white/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        </motion.div>
 
-<div>
-  <strong>🎨 Design & Content:<br/></strong> 
-  The Content & Design team tells the SEDS story in the most creative ways possible. Whether it&apos;s writing compelling blogs, crafting engaging social media posts, producing YouTube videos, or designing eye-catching visuals, we turn ideas into captivating content. If you love expressing yourself through words, visuals, or videos, this team is your creative playground.
-</div>
+        {/* Design & Content Card */}
+        <motion.div
+          initial={{ opacity: 0, x: -50 }}
+          animate={departmentsVisible ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="group relative backdrop-blur-xl bg-black/20 border border-white/20 rounded-xl p-5 hover:bg-black/30 hover:border-white/40 transition-all duration-500 hover:scale-[1.02] hover:shadow-xl hover:shadow-white/10"
+        >
+          <div className="flex items-center mb-3">
+            <div className="w-10 h-10 bg-white/10 border border-white/20 rounded-full flex items-center justify-center mr-3 group-hover:scale-110 transition-transform duration-300">
+              <span className="text-lg">🎨</span>
+            </div>
+            <h3 className="text-xl font-bold text-white group-hover:text-white/80 transition-colors duration-300">Design & Content</h3>
+          </div>
+          <p className="text-white/80 leading-relaxed group-hover:text-white transition-colors duration-300 text-sm">
+            The Content & Design team tells the SEDS story in the most creative ways possible. Whether it&apos;s writing compelling blogs, crafting engaging social media posts, producing YouTube videos, or designing eye-catching visuals, we turn ideas into captivating content.
+          </p>
+          <div className="absolute inset-0 bg-white/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        </motion.div>
 
-<div>
-  <strong>🌍 Outreach:<br/></strong> 
-  The Outreach team is the heart of our mission. Spreading awareness and igniting curiosity about space in young minds of India. We organize both offline and online initiatives that engage diverse communities, from school visits and public talks to social media campaigns and virtual events. If you&apos;re passionate about making science accessible and inspiring the next generation of space enthusiasts, Outreach is the place for you.
-</div>
-
-              </div>
-            </motion.div>
-          )}
-          </AnimatePresence>
+        {/* Outreach Card */}
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          animate={departmentsVisible ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="group relative backdrop-blur-xl bg-black/20 border border-white/20 rounded-xl p-5 hover:bg-black/30 hover:border-white/40 transition-all duration-500 hover:scale-[1.02] hover:shadow-xl hover:shadow-white/10"
+        >
+          <div className="flex items-center mb-3">
+            <div className="w-10 h-10 bg-white/10 border border-white/20 rounded-full flex items-center justify-center mr-3 group-hover:scale-110 transition-transform duration-300">
+              <span className="text-lg">🌍</span>
+            </div>
+            <h3 className="text-xl font-bold text-white group-hover:text-white/80 transition-colors duration-300">Outreach</h3>
+          </div>
+          <p className="text-white/80 leading-relaxed group-hover:text-white transition-colors duration-300 text-sm">
+            The Outreach team is the heart of our mission. Spreading awareness and igniting curiosity about space in young minds of India. We organize both offline and online initiatives that engage diverse communities, from school visits and public talks to social media campaigns.
+          </p>
+          <div className="absolute inset-0 bg-white/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        </motion.div>
+      </div>
+    </motion.div>
+  )}
+</AnimatePresence>
 
 
         </div>
       ) : (
-        <div className="w-full h-full flex items-center justify-center px-6 -mt-10">
-            <button
-            onClick={handleBackToMain}
-            className="absolute top-6 left-6 flex items-center text-white hover:text-gray-300 transition-colors z-50"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-            <span className="text-sm md:text-base">Back</span>
-          </button>
-          
+        <div className="relative z-10 w-full h-full flex items-center justify-center px-6 -mt-10">
           <div className="w-full max-w-4xl">
-          <div className="pt-20">
+            {/* Back Button above the form */}
+            <div className="flex justify-start pt-24 pb-0">
+              <button
+                onClick={handleBackToMain}
+                className="flex items-center text-white hover:text-gray-300 transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+                <span className="text-sm md:text-base">Back</span>
+              </button>
+            </div>
+            <div className="pt-4">
     {verificationSent && (
       <div className="mb-4 text-green-400 text-center font-medium p-4 bg-green-500/20 border border-green-500/50 rounded-md">
         ✅ Verification mail sent to your email. Please check your inbox and click the verification link.
@@ -548,7 +591,7 @@ const initialFormData: Application = {
       </div>
     )} */}
     
-          <form onSubmit={handleSubmit} className="w-full max-w-4xl space-y-6 backdrop-blur-md bg-black/60 md:bg-transparent p-6  rounded-lg border border-white/20">
+          <form onSubmit={handleSubmit} className="w-full max-w-4xl space-y-6 backdrop-blur-md bg-black/60 md:bg-transparent p-6  rounded-2xl border border-white/20">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-white text-sm font-medium mb-2">Full Name *</label>
