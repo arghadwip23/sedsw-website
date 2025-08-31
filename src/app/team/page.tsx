@@ -3,21 +3,29 @@ import React, { useEffect, useState } from 'react';
 import { Crown, Shield, User, Star, Users, Sparkles, Mail, Phone, BookOpen } from 'lucide-react';
 
 // Types
-type OrgRole = "president" | "vice-president" | "secretary" | "treasurer" | "member";
-type DeptRole = "lead" | "co-lead" | "member";
+type OrgRole =
+  | "chairperson"
+  | "vice chairperson"
+  | "general secretary"
+  | "treasurer"
+  | "lead"
+  | "deputy lead"
+  | "member";
 
 interface IUser {
   name: string;
   registrationNumber: string;
   email: string;
   phoneNumber: string;
-  branch: string;
+  branch?: string;
   orgRole: OrgRole;
   department: {
-    name: string;
-    role: DeptRole;
     isInRole: boolean;
+    role: string;
+    name: string;
   };
+  isCoreCommittee: boolean;
+  verifiedByPresident: boolean;
   isAdmin: boolean;
   profilePicture?: string;
   password: string;
@@ -51,55 +59,47 @@ const SpaceTeamPage = () => {
   // Helper functions
   const getOrgRoleIcon = (role: OrgRole) => {
     switch (role) {
-      case 'president': return <Crown className="w-6 h-6" />;
-      case 'vice-president': return <Shield className="w-6 h-6" />;
-      case 'secretary': return <BookOpen className="w-6 h-6" />;
+      case 'chairperson': return <Crown className="w-6 h-6" />;
+      case 'vice chairperson': return <Shield className="w-6 h-6" />;
+      case 'general secretary': return <BookOpen className="w-6 h-6" />;
       case 'treasurer': return <Star className="w-6 h-6" />;
+      case 'lead': return <Sparkles className="w-6 h-6" />;
+      case 'deputy lead': return <Users className="w-6 h-6" />;
       default: return <User className="w-6 h-6" />;
     }
   };
 
-  const getDeptRoleIcon = (role: DeptRole) => {
-    switch (role) {
-      case 'lead': return <Sparkles className="w-5 h-5" />;
-      case 'co-lead': return <Users className="w-5 h-5" />;
-      default: return <User className="w-5 h-5" />;
+  // Helper for department role icon
+  const getDeptRoleIcon = (role: string) => {
+    switch (role.toLowerCase()) {
+      case 'lead': return <Sparkles className="w-4 h-4" />;
+      case 'deputy lead': return <Users className="w-4 h-4" />;
+      case 'member': return <User className="w-4 h-4" />;
+      default: return <User className="w-4 h-4" />;
     }
   };
 
   const getOrgRolePriority = (role: OrgRole): number => {
-    const priorities = {
-      'president': 1,
-      'vice-president': 2,
-      'secretary': 3,
+    const priorities: Record<OrgRole, number> = {
+      'chairperson': 1,
+      'vice chairperson': 2,
+      'general secretary': 3,
       'treasurer': 4,
-      'member': 5
+      'lead': 5,
+      'deputy lead': 6,
+      'member': 7
     };
     return priorities[role];
   };
 
-  const getDeptRolePriority = (role: DeptRole): number => {
-    const priorities = {
-      'lead': 1,
-      'co-lead': 2,
-      'member': 3
-    };
-    return priorities[role];
-  };
-
-  // Sort team data by hierarchy
+  // Sort team data by hierarchy (orgRole priority, then department)
   const sortedTeamData = [...teamData].sort((a, b) => {
     const orgPriorityA = getOrgRolePriority(a.orgRole);
     const orgPriorityB = getOrgRolePriority(b.orgRole);
-    
     if (orgPriorityA !== orgPriorityB) {
       return orgPriorityA - orgPriorityB;
     }
-    
-    const deptPriorityA = getDeptRolePriority(a.department.role);
-    const deptPriorityB = getDeptRolePriority(b.department.role);
-    
-    return deptPriorityA - deptPriorityB;
+    return a.department.name.localeCompare(b.department.name);
   });
 
   if (loading) {

@@ -6,19 +6,7 @@ export interface IUserDocument extends IUser, Document {
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
-const DepartmentSubSchema = new Schema(
-  {
-    name: { type: String, required: true, trim: true },
-    role: {
-      type: String,
-      enum: ["lead", "co-lead", "member", "none"],
-      default: "none",
-      required: true,
-    },
-    isInRole: { type: Boolean, default: false },
-  },
-  { _id: false }
-);
+
 
 const UserSchema = new Schema<IUserDocument>(
   {
@@ -42,16 +30,30 @@ const UserSchema = new Schema<IUserDocument>(
       trim: true,
       match: /^[\d+\-\s()]{7,20}$/,
     },
-    branch: { type: String, required: true, trim: true },
+
+  // branch is only for non-core roles
+  branch: { type: String, trim: true, required: false },
+
 
     orgRole: {
       type: String,
-      enum: ["president", "vice-president", "secretary", "treasurer", "member"],
+      enum: [
+        "chairperson",
+        "vice chairperson",
+        "general secretary",
+        "treasurer",
+        "lead",
+        "deputy lead",
+        "member"
+      ],
       default: "member",
       required: true,
     },
 
-    department: { type: DepartmentSubSchema, required: true },
+    department: { type: String, required: true, trim: true },
+
+    isCoreCommittee: { type: Boolean, default: false },
+    verifiedByPresident: { type: Boolean, default: false },
 
     isAdmin: { type: Boolean, default: false },
 

@@ -8,15 +8,13 @@ interface FormData {
   registrationNumber: string;
   email: string;
   phoneNumber: string;
-  branch: string;
+  branch?: string;
   password: string;
-  confirmPassword?: string; // 👈 make optional
-  department: {
-    name: string;
-    role: string;
-    isInRole: boolean;
-  };
+  confirmPassword?: string;
+  department: string;
   orgRole: string;
+  isCoreCommittee: boolean;
+  verifiedByPresident: boolean;
   profilePicture: string;
 }
 
@@ -30,12 +28,10 @@ const SignupPage = () => {
     branch: '',
     password: '',
     confirmPassword: '',
-    department: {
-      name: '',
-      role: 'none',
-      isInRole: false
-    },
+    department: '',
     orgRole: 'member',
+    isCoreCommittee: false,
+    verifiedByPresident: false,
     profilePicture: "https://res.cloudinary.com/dpbjhiguv/image/upload/v1756234445/gallery/vif3hrmdqfkjc1jfmho5.jpg"
   });
 
@@ -46,15 +42,12 @@ const SignupPage = () => {
 
   const departmentOptions = ['project', 'events', 'outreach', 'design'];
   const orgRoleOptions = [
-    { value: 'president', label: 'President' },
-    { value: 'vice-president', label: 'Vice President' },
-    { value: 'secretary', label: 'Secretary' },
+    { value: 'chairperson', label: 'Chairperson' },
+    { value: 'vice chairperson', label: 'Vice Chairperson' },
+    { value: 'general secretary', label: 'General Secretary' },
     { value: 'treasurer', label: 'Treasurer' },
-    { value: 'member', label: 'Member' }
-  ];
-  const deptRoleOptions = [
     { value: 'lead', label: 'Lead' },
-    { value: 'co-lead', label: 'Co-Lead' },
+    { value: 'deputy lead', label: 'Deputy Lead' },
     { value: 'member', label: 'Member' }
   ];
 
@@ -66,7 +59,7 @@ const SignupPage = () => {
     if (!formData.email.trim()) newErrors.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
     if (!formData.phoneNumber.trim()) newErrors.phoneNumber = 'Phone number is required';
-    if (!formData.branch.trim()) newErrors.branch = 'Branch is required';
+    if (!(formData.branch ?? '').trim()) newErrors.branch = 'Branch is required';
     if (!formData.password) newErrors.password = 'Password is required';
     else if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
     if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
@@ -75,27 +68,16 @@ const SignupPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
     }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
-  };
-
-  const handleDepartmentChange = (field: string, value: string | boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      department: {
-        ...prev.department,
-        [field]: value,
-        isInRole: field === 'name' ? value !== '' : prev.department.isInRole
-      }
-    }));
   };
 
 const handleSubmit = async () => {
@@ -103,11 +85,9 @@ const handleSubmit = async () => {
 
   setIsLoading(true);
   try {
+
     const submitData = {
       ...formData,
-      department: formData.department.name
-        ? formData.department
-        : { name: "", role: "none", isInRole: false },
     };
 
     // ✅ remove confirmPassword before sending
@@ -273,8 +253,9 @@ const handleSubmit = async () => {
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-300">Department</label>
                     <select
-                      value={formData.department.name}
-                      onChange={(e) => handleDepartmentChange('name', e.target.value)}
+                      name="department"
+                      value={formData.department}
+                      onChange={handleInputChange}
                       className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white"
                     >
                       <option value="" className="bg-gray-800">Select Department</option>
@@ -286,21 +267,28 @@ const handleSubmit = async () => {
                     </select>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-300">Department Role</label>
-                    <select
-                      value={formData.department.role}
-                      onChange={(e) => handleDepartmentChange('role', e.target.value)}
-                      disabled={!formData.department.name}
-                      className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <option value="none" className="bg-gray-800">No Role</option>
-                      {deptRoleOptions.map(role => (
-                        <option key={role.value} value={role.value} className="bg-gray-800">
-                          {role.label}
-                        </option>
-                      ))}
-                    </select>
+                  <div className=" items-center space-x-4 mt-4 hidden">
+                    <label className="flex items-center text-sm text-gray-300">
+                      <input
+                        type="checkbox"
+                        name="isCoreCommittee"
+                        checked={formData.isCoreCommittee}
+                        onChange={handleInputChange}
+                        className="mr-2"
+                        disabled
+                      />
+                      Core Committee
+                    </label>
+                    <label className="flex items-center text-sm text-gray-300">
+                      <input
+                        type="checkbox"
+                        name="verifiedByPresident"
+                        checked={formData.verifiedByPresident}
+                        onChange={handleInputChange}
+                        className="mr-2"
+                      />
+                      Verified by President
+                    </label>
                   </div>
                 </div>
               </div>
