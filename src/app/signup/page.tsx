@@ -30,8 +30,8 @@ const SignupPage = () => {
     confirmPassword: '',
     department: '',
     orgRole: 'member',
-    isCoreCommittee: false,
-    verifiedByPresident: false,
+    isCoreCommittee: true,
+    verifiedByPresident: true,
     profilePicture: "https://res.cloudinary.com/dpbjhiguv/image/upload/v1756234445/gallery/vif3hrmdqfkjc1jfmho5.jpg"
   });
 
@@ -39,6 +39,8 @@ const SignupPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+    // (Removed stray destructuring assignment from e.target)
+    // The logic for updating formData is handled in handleInputChange.
 
   const departmentOptions = ['project', 'events', 'outreach', 'design'];
   const orgRoleOptions = [
@@ -48,7 +50,7 @@ const SignupPage = () => {
     { value: 'treasurer', label: 'Treasurer' },
     { value: 'lead', label: 'Lead' },
     { value: 'deputy lead', label: 'Deputy Lead' },
-    { value: 'member', label: 'Member' }
+    { value: 'member', label: 'Member' },
   ];
 
   const validateForm = () => {
@@ -85,9 +87,11 @@ const handleSubmit = async () => {
 
   setIsLoading(true);
   try {
-
+    // Always set department to 'Executive' for executive orgRoles
+    const executiveRoles = ["chairperson", "vice chairperson", "general secretary", "treasurer"];
     const submitData = {
       ...formData,
+      department: executiveRoles.includes(formData.orgRole) ? "Executive" : formData.department,
     };
 
     // ✅ remove confirmPassword before sending
@@ -267,7 +271,7 @@ const handleSubmit = async () => {
                         className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white"
                       >
                         <option value="" className="bg-gray-800">Select Department</option>
-                        {departmentOptions.map(dept => (
+                        {departmentOptions.map((dept: string) => (
                           <option key={dept} value={dept} className="bg-gray-800 capitalize">
                             {dept}
                           </option>
