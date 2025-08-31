@@ -250,22 +250,31 @@ const handleSubmit = async () => {
                     </select>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-300">Department</label>
-                    <select
-                      name="department"
-                      value={formData.department}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white"
-                    >
-                      <option value="" className="bg-gray-800">Select Department</option>
-                      {departmentOptions.map(dept => (
-                        <option key={dept} value={dept} className="bg-gray-800 capitalize">
-                          {dept}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  {["chairperson", "vice chairperson", "general secretary", "treasurer"].includes(formData.orgRole) ? (
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-300">Department</label>
+                      <div className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white flex items-center">
+                        Executive
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-300">Department</label>
+                      <select
+                        name="department"
+                        value={formData.department}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white"
+                      >
+                        <option value="" className="bg-gray-800">Select Department</option>
+                        {departmentOptions.map(dept => (
+                          <option key={dept} value={dept} className="bg-gray-800 capitalize">
+                            {dept}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
 
                   <div className=" items-center space-x-4 mt-4 hidden">
                     <label className="flex items-center text-sm text-gray-300">
