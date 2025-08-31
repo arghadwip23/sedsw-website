@@ -102,12 +102,12 @@ export async function POST(req: Request) {
     console.log("Verification URL:", verifyUrl);
 
     try {
-      await resend.emails.send({
-        from: "noreply@baujikapaisa.in",
-        to: body.email,
-        subject: "Verify your email",
-        html: verificationEmailTemplate(body.fullName, verifyUrl),
-      });
+      // await resend.emails.send({
+      //   from: "noreply@baujikapaisa.in",
+      //   to: body.email,
+      //   subject: "Verify your email",
+      //   html: verificationEmailTemplate(body.fullName, verifyUrl),
+      // });
       console.log("Verification email sent successfully");
     } catch (emailError) {
       console.error("Failed to send verification email:", emailError);
