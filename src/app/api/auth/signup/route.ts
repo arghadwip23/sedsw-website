@@ -8,17 +8,20 @@ export async function POST(req: Request) {
     await connectDB();
 
     const body = await req.json();
+
    const {
-  name,
-  registrationNumber,
-  email,
-  phoneNumber,
-  branch,
-  password,
-  department,   // ✅ accept from request
-  orgRole,
-  profilePicture
-} = body;
+    name,
+    registrationNumber,
+    email,
+    phoneNumber,
+    branch,
+    password,
+    department, // now a string
+    orgRole,
+    isCoreCommittee = false,
+    verifiedByPresident = false,
+    profilePicture
+  } = body;
 
     // 1️⃣ Check if user already exists
     const existingUser = await User.findOne({
@@ -36,16 +39,20 @@ export async function POST(req: Request) {
     }
 
     // 2️⃣ Create new user (password gets hashed by model pre-save hook)
+
     await User.create({
       name,
       registrationNumber,
       email,
       phoneNumber,
-      branch,
+      // Only set branch for non-core roles
+      branch: ["chairperson", "vice chairperson", "general secretary", "treasurer"].includes(orgRole) ? undefined : branch,
       password,
-      orgRole:orgRole|| "member", // enforce defaults
-      department: department||{ name: "", role: "none", isInRole: false },
-      profilePicture:"https://res.cloudinary.com/dpbjhiguv/image/upload/v1756234445/gallery/vif3hrmdqfkjc1jfmho5.jpg",
+      orgRole: orgRole || "member",
+      department: department || "",
+      isCoreCommittee,
+      verifiedByPresident,
+      profilePicture: profilePicture || "https://res.cloudinary.com/dpbjhiguv/image/upload/v1756234445/gallery/vif3hrmdqfkjc1jfmho5.jpg",
       isAdmin: false,
     });
 

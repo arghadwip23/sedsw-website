@@ -270,7 +270,7 @@ const initialFormData: Application = {
         setDeptError("");
         setRegError("");
         setFormData(initialFormData); // reset form
-        setVerificationSent(true);
+        setShowThankYou(true);
       } else {
         setVerificationSent(false);
         if (res.status === 400 && data.message && data.message.toLowerCase().includes('registration number already exists')) {
@@ -330,7 +330,7 @@ const initialFormData: Application = {
 
   if (showThankYou) {
     return (
-      <div className="relative w-full h-screen bg-transparent flex items-center justify-center">
+      <div className="relative w-full h-screen bg-transparent backdrop-blur-lg flex items-center justify-center">
         <GalaxyBackground />
         <div className="flex flex-col items-center justify-center text-center px-6 -mt-25">
           <BlurText
@@ -568,7 +568,7 @@ const initialFormData: Application = {
             <div className="pt-4">
     {verificationSent && (
       <div className="mb-4 text-green-400 text-center font-medium p-4 bg-green-500/20 border border-green-500/50 rounded-md">
-        ✅ Verification mail sent to your email. Please check your inbox and click the verification link.
+        ✅ Thank You 
         
       </div>
     )}

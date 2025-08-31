@@ -12,7 +12,9 @@ interface User {
   phoneNumber?: string;
   branch?: string;
   orgRole?: string;
-  department?: { name: string; role: string };
+  department?: string | { name: string; role: string };
+  isCoreCommittee?: boolean;
+  verifiedByPresident?: boolean;
   isAdmin?: boolean;
   profilePicture?: string;
 }
@@ -107,7 +109,7 @@ export default function ProfileCard() {
       <div className="text-center mt-4">
         <h2 className="text-xl font-semibold text-gray-800">{user.name}</h2>
         <p className="text-sm text-gray-500">
-          {user.orgRole || "Member"} {user.department ? ` - ${user.department.name}` : ""}
+          {user.orgRole || "Member"} {user.department ? (typeof user.department === 'string' ? ` - ${user.department}` : ` - ${user.department.name}`) : ""}
         </p>
         {user.isAdmin && (
           <span className="inline-block bg-red-100 text-red-600 text-xs px-2 py-1 mt-2 rounded-full">
@@ -140,10 +142,26 @@ export default function ProfileCard() {
         )}
         {user.department && (
           <div className="flex justify-between">
-            <span className="font-medium">Dept Role:</span>
-            <span>{user.department.role}</span>
+            <span className="font-medium">Department:</span>
+            <span>{typeof user.department === 'string' ? user.department : user.department.name}</span>
           </div>
         )}
+        <div className="flex justify-between">
+          <span className="font-medium">Core Committee:</span>
+          <span>{'isCoreCommittee' in user ? (user.isCoreCommittee ? "Yes" : "No") : "-"}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="font-medium">Verified by President:</span>
+          <span>{'verifiedByPresident' in user ? (user.verifiedByPresident ? "Yes" : "No") : "-"}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="font-medium">Core Committee:</span>
+          <span>{user.isCoreCommittee ? "Yes" : "No"}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="font-medium">Verified by President:</span>
+          <span>{user.verifiedByPresident ? "Yes" : "No"}</span>
+        </div>
       </div>
     </div>
   );
