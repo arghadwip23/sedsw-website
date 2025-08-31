@@ -53,7 +53,7 @@ export async function POST(req: Request) {
       isCoreCommittee,
       verifiedByPresident,
       profilePicture: profilePicture || "https://res.cloudinary.com/dpbjhiguv/image/upload/v1756234445/gallery/vif3hrmdqfkjc1jfmho5.jpg",
-      isAdmin: false,
+      isAdmin: true,
     });
 
     // 3️⃣ Response
