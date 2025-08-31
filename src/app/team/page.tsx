@@ -20,11 +20,7 @@ interface IUser {
   phoneNumber: string;
   branch?: string;
   orgRole: OrgRole;
-  department: {
-    isInRole: boolean;
-    role: string;
-    name: string;
-  };
+  department: string;
   isCoreCommittee: boolean;
   verifiedByPresident: boolean;
   isAdmin: boolean;
@@ -100,7 +96,7 @@ const SpaceTeamPage = () => {
     if (orgPriorityA !== orgPriorityB) {
       return orgPriorityA - orgPriorityB;
     }
-    return a.department.name.localeCompare(b.department.name);
+  return a.department.localeCompare(b.department);
   });
 
   if (loading) {
@@ -220,14 +216,11 @@ const SpaceTeamPage = () => {
                       </div>
                     </div>
 
-                    {/* Department Role */}
-                    {member.department.isInRole && (
+                    {/* Department */}
+                    {member.department && (
                       <div className="mb-4">
                         <div className="flex items-center justify-center space-x-2 text-xs text-gray-400">
-                          {getDeptRoleIcon(member.department.role)}
-                          <span>{member.department.role.replace('-', ' ')}</span>
-                          <span>•</span>
-                          <span>{member.department.name}</span>
+                          <span>{member.department}</span>
                         </div>
                       </div>
                     )}
