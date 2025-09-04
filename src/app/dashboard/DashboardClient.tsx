@@ -1,15 +1,36 @@
 // app/dashboard/DashboardClient.tsx
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import ProfileCard from "@/components/profilePic";
 import UploadGalleryImage from "@/components/uploadGalleryImage";
 import UploadEvent from "@/components/UploadEvent";
+import ApplicationsViewer from "@/components/ApplicationsViewer";
+import UserVerificationViewer from "@/components/UserVerificationViewer";
 import { Toaster } from "react-hot-toast";
 
-export default function DashboardClient({ isAdmin }: { isAdmin: boolean }) {
+interface DashboardClientProps {
+  isAdmin: boolean;
+  userRole: string;
+  userDepartment: string;
+  registrationNumber: string;
+  isCoreCommittee: boolean;
+}
+
+export default function DashboardClient({ 
+  isAdmin, 
+  userRole, 
+  userDepartment,
+  registrationNumber 
+  , isCoreCommittee
+}: DashboardClientProps) {
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState("profile");
+
+  const isExecutive = ["chairperson", "vice chairperson", "general secretary", "treasurer"].includes(userRole);
+  const isLead = userRole === "lead";
+  const canManageApplications = isAdmin || isExecutive || isLead;
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -32,23 +53,109 @@ export default function DashboardClient({ isAdmin }: { isAdmin: boolean }) {
         </button>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-1">
-          <ProfileCard />
+      <div className="mb-6">
+        <div className="flex space-x-4 border-b border-gray-200">
+          <button
+            onClick={() => setActiveTab("profile")}
+            className={`py-2 px-4 ${
+              activeTab === "profile"
+                ? "border-b-2 border-blue-500 text-blue-600"
+                : "text-gray-600 hover:text-gray-800"
+            }`}
+          >
+            Profile
+          </button>
+          
+          {isAdmin && (
+            <>
+              <button
+                onClick={() => setActiveTab("gallery")}
+                className={`py-2 px-4 ${
+                  activeTab === "gallery"
+                    ? "border-b-2 border-blue-500 text-blue-600"
+                    : "text-gray-600 hover:text-gray-800"
+                }`}
+              >
+                Gallery
+              </button>
+              <button
+                onClick={() => setActiveTab("events")}
+                className={`py-2 px-4 ${
+                  activeTab === "events"
+                    ? "border-b-2 border-blue-500 text-blue-600"
+                    : "text-gray-600 hover:text-gray-800"
+                }`}
+              >
+                Events
+              </button>
+            </>
+          )}
+          
+          {canManageApplications && (
+            <button
+              onClick={() => setActiveTab("applications")}
+              className={`py-2 px-4 ${
+                activeTab === "applications"
+                  ? "border-b-2 border-blue-500 text-blue-600"
+                  : "text-gray-600 hover:text-gray-800"
+              }`}
+            >
+              Applications
+            </button>
+          )}
+          
+          {(isExecutive || isAdmin) && (
+            <button
+              onClick={() => setActiveTab("verification")}
+              className={`py-2 px-4 ${
+                activeTab === "verification"
+                  ? "border-b-2 border-blue-500 text-blue-600"
+                  : "text-gray-600 hover:text-gray-800"
+              }`}
+            >
+              Verify Users
+            </button>
+          )}
         </div>
+      </div>
 
-        {isAdmin ? (
-          <>
-            <div className="md:col-span-1 space-y-6">
-              <UploadGalleryImage />
-            </div>
-            <div className="md:col-span-1">
-              <UploadEvent />
-            </div>
-          </>
-        ) : (
-          <div className="md:col-span-2 flex items-center justify-center text-gray-500 italic">
-            You don &apos;t have permission to access this section.
+      <div className="mt-6">
+        {activeTab === "profile" && (
+          <div className="md:w-1/2 mx-auto">
+            <ProfileCard />
+          </div>
+        )}
+        
+        {activeTab === "gallery" && isAdmin && (
+          <div className="md:w-2/3 mx-auto">
+            <UploadGalleryImage />
+          </div>
+        )}
+        
+        {activeTab === "events" && isAdmin && (
+          <div className="md:w-2/3 mx-auto">
+            <UploadEvent />
+          </div>
+        )}
+        
+        {activeTab === "applications" && canManageApplications && (
+          <div className="w-full">
+            <ApplicationsViewer 
+              userRole={userRole} 
+              userDepartment={userDepartment}
+              isAdmin={isAdmin} 
+              isCoreCommittee={isCoreCommittee}
+            />
+          </div>
+        )}
+        
+        {activeTab === "verification" && (isExecutive || isAdmin) && (
+          <div className="w-full">
+            <UserVerificationViewer 
+              userRole={userRole} 
+              userDepartment={userDepartment}
+              isAdmin={isAdmin} 
+            />
           </div>
         )}
       </div>

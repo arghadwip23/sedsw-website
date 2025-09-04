@@ -1,0 +1,104 @@
+// src/app/api/users/verify/[id]/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import connectDB from "@/lib/mongodb";
+import User from "@/models/User";
+import { cookies } from "next/headers";
+import { decodeJwt } from "jose";
+
+interface JWTPayload {
+  registrationNumber?: string;
+  orgRole?: string;
+  department?: string;
+  isAdmin?: boolean;
+  [key: string]: unknown;
+}
+
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    await connectDB();
+
+    // Verify the user is authenticated and get their role
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+
+    if (!token) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized: No token provided" },
+        { status: 401 }
+      );
+    }
+
+    let userRole = "";
+    let userDepartment = "";
+    let isAdmin = false;
+
+    try {
+      const decoded = decodeJwt<JWTPayload>(token);
+      userRole = decoded.orgRole as string;
+      userDepartment = decoded.department as string;
+      isAdmin = decoded.isAdmin === true;
+    } catch (error) {
+      console.error("JWT decode error:", error);
+      return NextResponse.json(
+        { success: false, message: "Unauthorized: Invalid token" },
+        { status: 401 }
+      );
+    }
+
+    // Check if user has permission to verify users
+    const isExecutive = ["chairperson", "vice chairperson", "general secretary", "treasurer"].includes(userRole);
+
+    // Enforce: only department executives may verify users (admins are NOT allowed per new policy)
+    if (!isExecutive) {
+      return NextResponse.json(
+        { success: false, message: "You don't have permission to verify users. Only department executives may verify members." },
+        { status: 403 }
+      );
+    }
+
+    // Get the user ID from the URL
+    const userId = params.id;
+
+    // Find the user
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    // Department executives can only verify users in their department
+    if (user.department !== userDepartment) {
+      return NextResponse.json(
+        { success: false, message: "You can only verify users in your department" },
+        { status: 403 }
+      );
+    }
+
+    // Update the user's verification status
+    user.verifiedByPresident = true;
+    
+    // Optionally set isCoreCommittee based on their role
+    if (["lead", "deputy lead"].includes(user.orgRole)) {
+      user.isCoreCommittee = true;
+    }
+
+    await user.save();
+
+    return NextResponse.json({
+      success: true,
+      message: "User verified successfully",
+    });
+  } catch (error) {
+    console.error("Error verifying user:", error);
+    return NextResponse.json(
+      { success: false, message: "Failed to verify user", error: String(error) },
+      { status: 500 }
+    );
+  }
+}

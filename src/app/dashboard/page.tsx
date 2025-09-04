@@ -4,7 +4,11 @@ import DashboardClient from "./DashboardClient";
 
 // Define JWT payload type
 interface JWTPayload {
+  registrationNumber?: string;
+  orgRole?: string;
+  department?: string;
   isAdmin?: boolean;
+  isCoreCommittee?: boolean;
   [key: string]: unknown; // allow extra claims without error
 }
 
@@ -13,15 +17,31 @@ export default async function Page() {
   const token = cookieStore.get("token")?.value; // name of your cookie
 
   let isAdmin = false;
+  let userRole = "";
+  let userDepartment = "";
+  let registrationNumber = "";
+  let isCoreCommittee = false;
 
   if (token) {
     try {
       const decoded = decodeJwt<JWTPayload>(token);
       isAdmin = decoded.isAdmin === true;
+      userRole = decoded.orgRole as string || "";
+      userDepartment = decoded.department as string || "";
+      registrationNumber = decoded.registrationNumber as string || "";
+  isCoreCommittee = decoded.isCoreCommittee === true;
     } catch {
       // silently ignore invalid token
     }
   }
 
-  return <DashboardClient isAdmin={isAdmin} />;
+  return (
+    <DashboardClient 
+      isAdmin={isAdmin} 
+      userRole={userRole} 
+      userDepartment={userDepartment}
+      registrationNumber={registrationNumber}
+  isCoreCommittee={isCoreCommittee}
+    />
+  );
 }
