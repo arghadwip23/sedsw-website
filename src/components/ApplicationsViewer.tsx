@@ -9,9 +9,10 @@ interface ApplicationsViewerProps {
   userRole: string;
   userDepartment: string;
   isAdmin: boolean;
+  isCoreCommittee?: boolean;
 }
 
-export default function ApplicationsViewer({ userRole, userDepartment, isAdmin }: ApplicationsViewerProps) {
+export default function ApplicationsViewer({ userRole, userDepartment, isAdmin, isCoreCommittee = false }: ApplicationsViewerProps) {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -182,20 +183,28 @@ export default function ApplicationsViewer({ userRole, userDepartment, isAdmin }
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
-                      {/* <button
-                        onClick={() => app._id && handleApprove(app._id)}
-                        className="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 p-2 rounded-full transition-colors"
-                        title="Approve application"
-                      >
-                        <Check size={16} />
-                      </button> */}
-                      <button
-                        onClick={() => app._id && handleReject(app._id)}
-                        className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-2 rounded-full transition-colors"
-                        title="Reject application"
-                      >
-                        <X size={16} />
-                      </button>
+                      {/** Only show approve/reject to core committee members (defense-in-depth: server also enforces) */}
+                      {isCoreCommittee && (
+                        <>
+                          <button
+                            onClick={() => app._id && handleApprove(app._id)}
+                            className="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 p-2 rounded-full transition-colors"
+                            title="Approve application"
+                          >
+                            <Check size={16} />
+                          </button>
+                          <button
+                            onClick={() => app._id && handleReject(app._id)}
+                            className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-2 rounded-full transition-colors"
+                            title="Reject application"
+                          >
+                            <X size={16} />
+                          </button>
+                        </>
+                      )}
+                      {!isCoreCommittee && (
+                        <div className="text-xs text-gray-500 italic">Only core committee can approve/reject</div>
+                      )}
                     </div>
                   </td>
                 </tr>

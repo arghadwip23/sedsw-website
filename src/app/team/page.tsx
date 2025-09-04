@@ -234,7 +234,7 @@ const SpaceTeamPage = () => {
                         
                         {/* Profile Picture */}
                         <div className="relative mb-6">
-                          <div className="w-24 h-24 mx-auto rounded-full overflow-hidden border-2 border-white/20 group-hover:border-white/40 transition-colors duration-300">
+                          <div className="w-38 h-38 mx-auto rounded-md overflow-hidden border-2 border-white/20 group-hover:border-white/40 transition-colors duration-300">
                             {member.profilePicture ? (
                               <img
                                 src={member.profilePicture}

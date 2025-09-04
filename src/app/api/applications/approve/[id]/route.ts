@@ -50,16 +50,17 @@ export async function POST(
     }
 
     // Check if user has permission to approve applications
-    const isExecutive = ["chairperson", "vice chairperson", "general secretary", "treasurer"].includes(userRole);
-    const isLead = userRole === "lead";
+    // New policy: only core committee members may approve applications.
+    // The JWT should include an `isCoreCommittee` claim. Admins are not allowed to bypass this.
+    const payload: any = decodeJwt<JWTPayload>(token as string);
+    const isCore = payload?.isCoreCommittee === true;
 
-    if (!isAdmin && !isExecutive && !isLead) {
+    if (!isCore) {
       return NextResponse.json(
-        { success: false, message: "You don't have permission to approve applications" },
+        { success: false, message: "You don't have permission to approve applications. Only core committee members may approve." },
         { status: 403 }
       );
     }
-
     // Get the application ID from the URL
     const applicationId = params.id;
 
@@ -73,8 +74,8 @@ export async function POST(
       );
     }
 
-    // Department leads can only approve applications for their department
-    if (isLead && !isAdmin && !isExecutive && application.primaryDepartment !== userDepartment) {
+    // If the core committee member is a department lead (role 'lead'), enforce department match
+    if (userRole === 'lead' && application.primaryDepartment !== userDepartment) {
       return NextResponse.json(
         { success: false, message: "You can only approve applications for your department" },
         { status: 403 }

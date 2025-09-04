@@ -7,6 +7,7 @@ import ProfileCard from "@/components/profilePic";
 import UploadGalleryImage from "@/components/uploadGalleryImage";
 import UploadEvent from "@/components/UploadEvent";
 import ApplicationsViewer from "@/components/ApplicationsViewer";
+import UserVerificationViewer from "@/components/UserVerificationViewer";
 import { Toaster } from "react-hot-toast";
 
 interface DashboardClientProps {
@@ -14,6 +15,7 @@ interface DashboardClientProps {
   userRole: string;
   userDepartment: string;
   registrationNumber: string;
+  isCoreCommittee: boolean;
 }
 
 export default function DashboardClient({ 
@@ -21,6 +23,7 @@ export default function DashboardClient({
   userRole, 
   userDepartment,
   registrationNumber 
+  , isCoreCommittee
 }: DashboardClientProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("profile");
@@ -100,6 +103,19 @@ export default function DashboardClient({
               Applications
             </button>
           )}
+          
+          {(isExecutive || isAdmin) && (
+            <button
+              onClick={() => setActiveTab("verification")}
+              className={`py-2 px-4 ${
+                activeTab === "verification"
+                  ? "border-b-2 border-blue-500 text-blue-600"
+                  : "text-gray-600 hover:text-gray-800"
+              }`}
+            >
+              Verify Users
+            </button>
+          )}
         </div>
       </div>
 
@@ -125,6 +141,17 @@ export default function DashboardClient({
         {activeTab === "applications" && canManageApplications && (
           <div className="w-full">
             <ApplicationsViewer 
+              userRole={userRole} 
+              userDepartment={userDepartment}
+              isAdmin={isAdmin} 
+              isCoreCommittee={isCoreCommittee}
+            />
+          </div>
+        )}
+        
+        {activeTab === "verification" && (isExecutive || isAdmin) && (
+          <div className="w-full">
+            <UserVerificationViewer 
               userRole={userRole} 
               userDepartment={userDepartment}
               isAdmin={isAdmin} 

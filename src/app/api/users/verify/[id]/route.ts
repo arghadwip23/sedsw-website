@@ -1,7 +1,7 @@
-// src/app/api/applications/reject/[id]/route.ts
+// src/app/api/users/verify/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
-import PendingApplicationModel from "@/models/PendingApplicationModel";
+import User from "@/models/User";
 import { cookies } from "next/headers";
 import { decodeJwt } from "jose";
 
@@ -48,53 +48,56 @@ export async function POST(
       );
     }
 
-    // Check if user has permission to reject applications
-    // New policy: only core committee members may reject applications.
-    const payload: any = decodeJwt<JWTPayload>(token as string);
-    const isCore = payload?.isCoreCommittee === true;
+    // Check if user has permission to verify users
+    const isExecutive = ["chairperson", "vice chairperson", "general secretary", "treasurer"].includes(userRole);
 
-    if (!isCore) {
+    // Enforce: only department executives may verify users (admins are NOT allowed per new policy)
+    if (!isExecutive) {
       return NextResponse.json(
-        { success: false, message: "You don't have permission to reject applications. Only core committee members may reject." },
+        { success: false, message: "You don't have permission to verify users. Only department executives may verify members." },
         { status: 403 }
       );
     }
 
-    // Get the application ID from the URL
-    const applicationId = params.id;
+    // Get the user ID from the URL
+    const userId = params.id;
 
-    // Find the pending application
-    const application = await PendingApplicationModel.findById(applicationId);
+    // Find the user
+    const user = await User.findById(userId);
 
-    if (!application) {
+    if (!user) {
       return NextResponse.json(
-        { success: false, message: "Application not found" },
+        { success: false, message: "User not found" },
         { status: 404 }
       );
     }
 
-    // If the core committee member is a department lead (role 'lead'), enforce department match
-    if (userRole === 'lead' && application.primaryDepartment !== userDepartment) {
+    // Department executives can only verify users in their department
+    if (user.department !== userDepartment) {
       return NextResponse.json(
-        { success: false, message: "You can only reject applications for your department" },
+        { success: false, message: "You can only verify users in your department" },
         { status: 403 }
       );
     }
 
-    // Delete the pending application
-    await PendingApplicationModel.findByIdAndDelete(applicationId);
+    // Update the user's verification status
+    user.verifiedByPresident = true;
+    
+    // Optionally set isCoreCommittee based on their role
+    if (["lead", "deputy lead"].includes(user.orgRole)) {
+      user.isCoreCommittee = true;
+    }
 
-    // Send an email to the user informing them that their application was rejected
-    // TODO: Implement email sending
+    await user.save();
 
     return NextResponse.json({
       success: true,
-      message: "Application rejected successfully",
+      message: "User verified successfully",
     });
   } catch (error) {
-    console.error("Error rejecting application:", error);
+    console.error("Error verifying user:", error);
     return NextResponse.json(
-      { success: false, message: "Failed to reject application", error: String(error) },
+      { success: false, message: "Failed to verify user", error: String(error) },
       { status: 500 }
     );
   }

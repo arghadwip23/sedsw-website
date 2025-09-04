@@ -8,6 +8,7 @@ interface JWTPayload {
   orgRole?: string;
   department?: string;
   isAdmin?: boolean;
+  isCoreCommittee?: boolean;
   [key: string]: unknown; // allow extra claims without error
 }
 
@@ -19,6 +20,7 @@ export default async function Page() {
   let userRole = "";
   let userDepartment = "";
   let registrationNumber = "";
+  let isCoreCommittee = false;
 
   if (token) {
     try {
@@ -27,6 +29,7 @@ export default async function Page() {
       userRole = decoded.orgRole as string || "";
       userDepartment = decoded.department as string || "";
       registrationNumber = decoded.registrationNumber as string || "";
+  isCoreCommittee = decoded.isCoreCommittee === true;
     } catch {
       // silently ignore invalid token
     }
@@ -38,6 +41,7 @@ export default async function Page() {
       userRole={userRole} 
       userDepartment={userDepartment}
       registrationNumber={registrationNumber}
+  isCoreCommittee={isCoreCommittee}
     />
   );
 }
