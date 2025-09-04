@@ -11,12 +11,13 @@ interface JWTPayload {
   orgRole?: string;
   department?: string;
   isAdmin?: boolean;
+  isCoreCommittee?: boolean;
   [key: string]: unknown;
 }
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     await connectDB();
@@ -50,19 +51,22 @@ export async function POST(
     }
 
     // Check if user has permission to approve applications
-    // New policy: only core committee members may approve applications.
-    // The JWT should include an `isCoreCommittee` claim. Admins are not allowed to bypass this.
-    const payload: any = decodeJwt<JWTPayload>(token as string);
+    const payload: JWTPayload = decodeJwt<JWTPayload>(token);
     const isCore = payload?.isCoreCommittee === true;
 
     if (!isCore) {
       return NextResponse.json(
-        { success: false, message: "You don't have permission to approve applications. Only core committee members may approve." },
+        {
+          success: false,
+          message:
+            "You don't have permission to approve applications. Only core committee members may approve.",
+        },
         { status: 403 }
       );
     }
+
     // Get the application ID from the URL
-    const applicationId = params.id;
+    const applicationId = context.params.id;
 
     // Find the pending application
     const application = await PendingApplicationModel.findById(applicationId);
@@ -74,41 +78,39 @@ export async function POST(
       );
     }
 
-    // If the core committee member is a department lead (role 'lead'), enforce department match
-    if (userRole === 'lead' && application.primaryDepartment !== userDepartment) {
+    // If the core committee member is a department lead, enforce department match
+    if (userRole === "lead" && application.primaryDepartment !== userDepartment) {
       return NextResponse.json(
-        { success: false, message: "You can only approve applications for your department" },
+        {
+          success: false,
+          message:
+            "You can only approve applications for your department",
+        },
         { status: 403 }
       );
     }
 
-    // Format phone number to ensure it matches the required format
+    // Format phone number
     const formatPhoneNumber = (phone: string): string => {
-      // Remove any characters that don't match the validation pattern
-      const cleaned = phone.replace(/[^\d+\-\s()]/g, '');
-      
-      // Ensure it has at least 7 digits
-      const digits = cleaned.replace(/\D/g, '');
+      const cleaned = phone.replace(/[^\d+\-\s()]/g, "");
+      const digits = cleaned.replace(/\D/g, "");
       if (digits.length < 7) {
-        // If not enough digits, add placeholder digits
-        return digits + '0'.repeat(7 - digits.length);
+        return digits + "0".repeat(7 - digits.length);
       }
-      
       return cleaned;
     };
 
-    // Create a new user from the application data
+    // Create a new user
     const newUser = new User({
       name: application.fullName,
       registrationNumber: application.registrationNumber,
       email: application.email,
       phoneNumber: formatPhoneNumber(application.phone),
       department: application.primaryDepartment,
-      orgRole: "member", // Default role for new members
+      orgRole: "member",
       isCoreCommittee: false,
       verifiedByPresident: false,
       isAdmin: false,
-      // Generate a more readable temporary password (should be changed by the user)
       password: `SEDS${Math.floor(10000 + Math.random() * 90000)}`,
     });
 
@@ -116,18 +118,17 @@ export async function POST(
       await newUser.save();
     } catch (saveError) {
       console.error("Failed to save new user:", saveError);
-      // Return detailed error for debugging
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           message: "Failed to create user from application",
           error: String(saveError),
           userData: {
             name: newUser.name,
             email: newUser.email,
             phoneNumber: newUser.phoneNumber,
-            department: newUser.department
-          }
+            department: newUser.department,
+          },
         },
         { status: 500 }
       );
@@ -136,8 +137,7 @@ export async function POST(
     // Delete the pending application
     await PendingApplicationModel.findByIdAndDelete(applicationId);
 
-    // Send an email to the user informing them that their application was approved
-    // TODO: Implement email sending
+    // TODO: Send email notification
 
     return NextResponse.json({
       success: true,
@@ -146,7 +146,11 @@ export async function POST(
   } catch (error) {
     console.error("Error approving application:", error);
     return NextResponse.json(
-      { success: false, message: "Failed to approve application", error: String(error) },
+      {
+        success: false,
+        message: "Failed to approve application",
+        error: String(error),
+      },
       { status: 500 }
     );
   }
