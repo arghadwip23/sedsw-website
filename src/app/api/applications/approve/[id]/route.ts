@@ -17,7 +17,7 @@ interface JWTPayload {
 
 export async function POST(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     await connectDB();
@@ -66,7 +66,7 @@ export async function POST(
     }
 
     // Get the application ID from the URL
-    const applicationId = context.params.id;
+  const applicationId = params.id;
 
     // Find the pending application
     const application = await PendingApplicationModel.findById(applicationId);
