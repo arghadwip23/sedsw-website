@@ -6,7 +6,7 @@ export function verifyOrigin(req: Request): Response | null {
   const allowedOrigins = [
     "http://localhost:3000",
     "https://sedsantariksh25.netlify.app",
-    "https://sedsantariksh.com" // replace with production domain
+    "https://sedsantariksh.com", // replace with production domain
     "http://sedsantariksh.com" // replace with production domain
   ];
 
