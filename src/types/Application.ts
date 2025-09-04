@@ -1,6 +1,7 @@
 // types/Application.ts
 
 export interface Application {
+  _id?: string;        // MongoDB document ID
   fullName: string;
   registrationNumber: string;
   email: string;
