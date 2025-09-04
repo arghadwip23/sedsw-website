@@ -3,7 +3,7 @@ import connectDB from "@/lib/mongodb";
 import ApplicationModel from "@/models/ApplicationModel";
 import PendingApplicationModel from "@/models/PendingApplicationModel";
 import { Application, ApiResponse } from "@/types/Application";
-import { verifyOrigin } from "@/lib/security";
+//import { verifyOrigin } from "@/lib/security";
 import { Resend } from "resend";
 import crypto from "crypto";
 import  verificationEmailTemplate  from "@/lib/emailTemplate";
@@ -13,11 +13,11 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function POST(req: Request) {
   try {
     console.log("Applications API called");
-    const authError = verifyOrigin(req);
-    if (authError) {
-      console.log("Origin verification failed:", authError);
-      return authError;
-    }
+    // const authError = verifyOrigin(req);
+    // if (authError) {
+    //   console.log("Origin verification failed:", authError);
+    //   return authError;
+    // }
 
     await connectDB();
     console.log("Database connected");
