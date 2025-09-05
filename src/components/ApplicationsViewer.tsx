@@ -65,8 +65,21 @@ export default function ApplicationsViewer({ userRole, userDepartment, isAdmin, 
   }, [selectedDepartment]);
 
   const handleApprove = async (applicationId: string) => {
+    // Get token from cookies
+    const getToken = () => {
+      if (typeof document !== 'undefined') {
+        const match = document.cookie.match(/(?:^|; )token=([^;]*)/);
+        return match ? decodeURIComponent(match[1]) : null;
+      }
+      return null;
+    };
+    const token = getToken();
     toast.promise(
-      fetch(`/api/applications/approve/${applicationId}`, { method: 'POST' })
+      fetch('/api/applications/approve/route', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, applicationId })
+      })
         .then(res => {
           if (!res.ok) throw new Error('Failed to approve application');
           fetchApplications(); // Refresh the list
