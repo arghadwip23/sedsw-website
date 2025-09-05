@@ -15,8 +15,8 @@ function Stars({ count }: { count: number }) {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   const [starPositions, starColors] = useMemo(() => {
-    let positions = [];
-    let colors = [];
+    const positions = [];
+    const colors = [];
 
   for (let i = 0; i < count; i++) {
       const distance = 15 + Math.random() * 5; // Stars start farther away
@@ -25,7 +25,7 @@ function Stars({ count }: { count: number }) {
       const z = (Math.random() - 0.5) * distance;
       positions.push(x, y, z);
 
-      let color = new THREE.Color();
+      const color = new THREE.Color();
       const colorOptions = ["white", "lightyellow", "paleblue"];
       color.setStyle(
         colorOptions[Math.floor(Math.random() * colorOptions.length)]
