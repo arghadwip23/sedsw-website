@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import React, { useState, useRef, useEffect, Suspense, useMemo } from "react";
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import { useGLTF, OrbitControls, Effects } from "@react-three/drei";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { Bloom } from "@react-three/postprocessing";
 import { KernelSize } from "postprocessing";
@@ -15,8 +15,8 @@ function Stars({ count }: { count: number }) {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   const [starPositions, starColors] = useMemo(() => {
-    let positions = [];
-    let colors = [];
+    const positions = [];
+    const colors = [];
 
     for (let i = 0; i < count; i++) {
       const distance = 15 + Math.random() * 5; // Stars start farther away
