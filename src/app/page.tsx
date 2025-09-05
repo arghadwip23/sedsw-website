@@ -1,12 +1,101 @@
 "use client";
 
 import Link from "next/link";
-import React, { useState, useRef, useEffect, Suspense } from "react";
+import React, { useState, useRef, useEffect, Suspense, useMemo } from "react";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { useGLTF, OrbitControls, Effects } from "@react-three/drei";
 import * as THREE from "three";
 import { Bloom } from "@react-three/postprocessing";
 import { KernelSize } from "postprocessing";
+
+function Stars({ count }: { count: number }) {
+  const starGeometry = useRef<THREE.BufferGeometry>(null);
+  const starMaterial = useRef<THREE.PointsMaterial>(null);
+  const stars = useRef<THREE.Points>(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  const [starPositions, starColors] = useMemo(() => {
+    let positions = [];
+    let colors = [];
+
+    for (let i = 0; i < count; i++) {
+      const distance = 15 + Math.random() * 5; // Stars start farther away
+      const x = (Math.random() - 0.5) * distance;
+      const y = (Math.random() - 0.5) * distance;
+      const z = (Math.random() - 0.5) * distance;
+      positions.push(x, y, z);
+
+      let color = new THREE.Color();
+      const colorOptions = ["white", "lightyellow", "paleblue"];
+      color.setStyle(
+        colorOptions[Math.floor(Math.random() * colorOptions.length)]
+      );
+      colors.push(color.r, color.g, color.b);
+    }
+
+    return [new Float32Array(positions), new Float32Array(colors)];
+  }, [count]);
+
+  useEffect(() => {
+    if (!starGeometry.current) {
+      starGeometry.current = new THREE.BufferGeometry();
+    }
+
+    starGeometry.current.setAttribute(
+      "position",
+      new THREE.BufferAttribute(starPositions, 3)
+    );
+    starGeometry.current.setAttribute(
+      "color",
+      new THREE.BufferAttribute(starColors, 3)
+    );
+
+    if (!starMaterial.current) {
+      starMaterial.current = new THREE.PointsMaterial({
+        size: 0.05,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.8,
+      });
+    }
+
+    if (!stars.current) {
+      stars.current = new THREE.Points(starGeometry.current, starMaterial.current);
+    }
+
+    const handleMouseMove = (event: MouseEvent) => {
+      // Normalize mouse coordinates to -1 to 1 range
+      setMousePosition({
+        x: (event.clientX / window.innerWidth) * 2 - 1,
+        y: -(event.clientY / window.innerHeight) * 2 + 1,
+      });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, [starColors, starPositions]);
+
+  useFrame(() => {
+    if (stars.current) {
+      // Apply rotation based on mouse position
+      stars.current.rotation.y = THREE.MathUtils.lerp(
+        stars.current.rotation.y,
+        mousePosition.x * 0.05, // Adjust sensitivity as needed
+        0.1 // Adjust smoothing factor as needed
+      );
+      stars.current.rotation.x = THREE.MathUtils.lerp(
+        stars.current.rotation.x,
+        -mousePosition.y * 0.05, // Adjust sensitivity as needed
+        0.1 // Adjust smoothing factor as needed
+      );
+    }
+  });
+
+  return stars.current ? <primitive object={stars.current} /> : null;
+}
 
 function EarthModel() {
   const meshRef = useRef<THREE.Group>(null);
@@ -91,6 +180,7 @@ export default function Home() {
           <Suspense fallback={null}>
             <EarthModel />
           </Suspense>
+          <Stars count={500} />
           <Bloom
             intensity={1.0} // The bloom intensity.
             blurPass={undefined} // A blur pass.
@@ -102,12 +192,17 @@ export default function Home() {
         </Canvas>
       </div>
 
-      <div className={`w-full h-full z-0 flex flex-col justify-center gap-40 transition-opacity duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
-        <div className="pl-10">
-          <p className="text-white text-2xl">Welcome to</p>
-          <h1 className="text-white text-5xl font-extrabold">SEDS ANTARIKSH</h1>
+      <div
+        className={`w-full h-full z-10 flex flex-col items-center justify-center transition-opacity duration-500 ${isLoading ? "opacity-0" : "opacity-100"
+          }`}
+      >
+        <div className="text-center">
+          <p className="text-white text-2xl drop-shadow-lg">Welcome to</p>
+          <h1 className="text-white text-5xl font-extrabold drop-shadow-lg">
+            SEDS ANTARIKSH
+          </h1>
         </div>
-        <div className="pl-10 flex items-center align-middle">
+        <div className="mt-8 flex items-center justify-center">
           <Link
             href={"/about"}
             className="group relative p-4 border-2 border-white flex justify-center items-center bg-transparent text-white transition-all duration-300 hover:px-6 hover:bg-white hover:text-black overflow-hidden w-40"
