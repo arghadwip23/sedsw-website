@@ -117,7 +117,7 @@ export default function ApplicationsViewer({ userRole, userDepartment, isAdmin, 
           Pending Applications
         </h2>
         
-        <div className="flex gap-4 items-center">
+        <div className="flex gap-4 items-center text-black">
           {canSelectDepartment && (
             <select
               value={selectedDepartment}
