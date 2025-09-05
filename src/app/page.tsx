@@ -25,7 +25,7 @@ function Stars({ count }: { count: number }) {
       const z = (Math.random() - 0.5) * distance;
       positions.push(x, y, z);
 
-      let color = new THREE.Color();
+      const color = new THREE.Color();
       const colorOptions = ["white", "lightyellow", "paleblue"];
       color.setStyle(
         colorOptions[Math.floor(Math.random() * colorOptions.length)]
