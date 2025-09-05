@@ -10,11 +10,12 @@ import ApplicationsViewer from "@/components/ApplicationsViewer";
 import UserVerificationViewer from "@/components/UserVerificationViewer";
 import { Toaster } from "react-hot-toast";
 
-interface DashboardClientProps {
+export interface DashboardClientProps {
   isAdmin: boolean;
   userRole: string;
   userDepartment: string;
   isCoreCommittee: boolean;
+  registrationNumber?: string;
 }
 
 export default function DashboardClient({
@@ -22,6 +23,7 @@ export default function DashboardClient({
   userRole,
   userDepartment,
   isCoreCommittee,
+  
 }: DashboardClientProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("profile");

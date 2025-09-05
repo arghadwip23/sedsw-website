@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { decodeJwt } from "jose";
 import DashboardClient from "./DashboardClient";
+import {DashboardClientProps} from "./DashboardClient";
 
 // Define JWT payload type
 interface JWTPayload {
@@ -35,13 +36,13 @@ export default async function Page() {
     }
   }
 
-  return (
-    <DashboardClient 
-      isAdmin={isAdmin} 
-      userRole={userRole} 
-      userDepartment={userDepartment}
-      registrationNumber={registrationNumber}
-  isCoreCommittee={isCoreCommittee}
-    />
-  );
+  const dashboardClientProps: DashboardClientProps = {
+    isAdmin,
+    userRole,
+    userDepartment,
+    registrationNumber,
+    isCoreCommittee,
+  };
+
+  return <DashboardClient {...dashboardClientProps} />;
 }
