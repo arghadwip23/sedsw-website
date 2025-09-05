@@ -198,13 +198,13 @@ export default function Home() {
       >
         <div className="text-center relative">
           <span className="absolute -inset-2 rounded-3xl blur-md opacity-50 bg-black/50"></span>
-          <p className="text-white md:text-5xl text-3xl drop-shadow-lg relative px-4 py-2" style={{ textShadow: '160px 160px 2px rgba(0,0,0,0.8)' }}>Welcome to</p>
-          <h1 className="text-white md:text-9xl text-5xl font-extrabold drop-shadow-lg relative px-4 py-2" style={{ textShadow: '16px 16px 25px rgba(0,0,0,0.8)', letterSpacing: '1px' }}>SEDS ANTARIKSH</h1>
+          <p className="text-white md:text-5xl text-3xl drop-shadow-lg relative px-4 py-2" style={{ textShadow: '2px 2px 2px rgba(0,0,0,0.8)' }}>Welcome to</p>
+          <h1 className="text-white md:text-9xl text-5xl font-extrabold drop-shadow-lg relative px-4 py-2" style={{ textShadow: '2px 2px 2px rgba(0,0,0,0.8)', letterSpacing: '1px' }}>SEDS ANTARIKSH</h1>
         </div>
         <div className="mt-8 flex items-center justify-center">
           <Link
             href={"/about"}
-            className="group relative p-4 border-2 border-white/30 flex justify-center items-center backdrop-blur-xl rounded-2xl text-white transition-all duration-300 hover:px-6 hover:bg-white hover:text-black overflow-hidden w-40"
+            className="group relative p-4 border-2 border-white/30 flex justify-center items-center backdrop-blur-xl rounded-2xl active:scale-95 text-white transition-all duration-300 hover:px-6 hover:bg-white hover:text-black overflow-hidden w-40"
           >
             <div className="flex items-center justify-center relative w-full">
               <span className="transition-all duration-300 group-hover:translate-x-[-8px]">
