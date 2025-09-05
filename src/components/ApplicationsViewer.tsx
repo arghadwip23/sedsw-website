@@ -95,7 +95,7 @@ export default function ApplicationsViewer({ userRole, userDepartment, isAdmin, 
 
   const handleReject = async (applicationId: string) => {
     toast.promise(
-      fetch(`/api/applications/reject/${applicationId}`, { method: 'POST' })
+      fetch(`/api/applications/reject?id=${applicationId}`, { method: 'POST' })
         .then(res => {
           if (!res.ok) throw new Error('Failed to reject application');
           fetchApplications(); // Refresh the list
