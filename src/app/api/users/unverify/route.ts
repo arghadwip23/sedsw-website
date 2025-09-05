@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
       const decoded = decodeJwt<JWTPayload>(token);
       userRole = decoded.orgRole as string;
       userDepartment = decoded.department as string;
-    } catch (error) {
+    } catch {
       return NextResponse.json({ success: false, message: "Unauthorized: Invalid token" }, { status: 401 });
     }
     const isExecutive = ["chairperson", "vice chairperson", "general secretary", "treasurer"].includes(userRole);

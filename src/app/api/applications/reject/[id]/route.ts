@@ -15,7 +15,7 @@ interface JWTPayload {
 
 export async function POST(
   req: NextRequest,
-  context: any
+  context: { params: { id: string } }
 ) {
   try {
     await connectDB();
@@ -33,25 +33,21 @@ export async function POST(
 
     let userRole = "";
     let userDepartment = "";
-    let isAdmin = false;
 
+    let decoded: JWTPayload | undefined;
     try {
-      const decoded = decodeJwt<JWTPayload>(token);
+      decoded = decodeJwt<JWTPayload>(token as string);
       userRole = decoded.orgRole as string;
       userDepartment = decoded.department as string;
-      isAdmin = decoded.isAdmin === true;
-    } catch (error) {
-      console.error("JWT decode error:", error);
+    } catch (err) {
+      console.error("JWT decode error:", err);
       return NextResponse.json(
         { success: false, message: "Unauthorized: Invalid token" },
         { status: 401 }
       );
     }
 
-    // Check if user has permission to reject applications
-    // New policy: only core committee members may reject applications.
-    const payload: any = decodeJwt<JWTPayload>(token as string);
-    const isCore = payload?.isCoreCommittee === true;
+    const isCore = decoded?.isCoreCommittee === true;
 
     if (!isCore) {
       return NextResponse.json(

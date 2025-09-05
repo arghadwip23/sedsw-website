@@ -1,4 +1,5 @@
-"use client"
+/* eslint-disable @next/next/no-img-element */
+"use client";
 import React, { useEffect, useState } from 'react';
 import { Crown, Shield, User, Star, Users, Sparkles, Mail, Phone, BookOpen } from 'lucide-react';
 import Galaxy from '../../../Backgrounds/Galaxy/Galaxy';

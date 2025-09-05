@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
       userRole = decoded.orgRole as string;
       userDepartment = decoded.department as string;
       isCore = decoded.isCoreCommittee === true;
-    } catch (error) {
+  } catch {
       return NextResponse.json(
         { success: false, message: "Invalid token" },
         { status: 401 }

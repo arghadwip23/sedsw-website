@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Application } from '@/types/Application';
 import { Loader2, RefreshCw, Check, X, UserPlus } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -34,7 +34,7 @@ export default function ApplicationsViewer({ userRole, userDepartment, isAdmin, 
     { value: 'Executive', label: 'Executive' }
   ];
 
-  const fetchApplications = async () => {
+  const fetchApplications = useCallback(async () => {
     try {
       setLoading(true);
       const endpoint = `/api/applications/pending${selectedDepartment !== 'all' ? `?department=${selectedDepartment}` : ''}`;
@@ -58,11 +58,11 @@ export default function ApplicationsViewer({ userRole, userDepartment, isAdmin, 
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedDepartment]);
 
   useEffect(() => {
     fetchApplications();
-  }, [selectedDepartment]);
+  }, [fetchApplications]);
 
   const handleApprove = async (applicationId: string) => {
     // Get token from cookies

@@ -28,14 +28,12 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    let userRole = "";
-    let userDepartment = "";
-    let isAdmin = false;
+  let userRole = "";
+  let isAdmin = false;
 
     try {
       const decoded = decodeJwt<JWTPayload>(token);
-      userRole = decoded.orgRole as string;
-      userDepartment = decoded.department as string;
+  userRole = decoded.orgRole as string;
       isAdmin = decoded.isAdmin === true;
     } catch (error) {
       console.error("JWT decode error:", error);
@@ -61,7 +59,7 @@ export async function GET(req: NextRequest) {
     const verifiedParam = url.searchParams.get("verified");
     
   // Build the query
-  const query: any = {};
+  const query: Record<string, unknown> = {};
     
     // Filter by department if provided
     if (departmentParam && departmentParam !== "all") {
