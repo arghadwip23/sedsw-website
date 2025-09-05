@@ -95,7 +95,7 @@ export default function UserVerificationViewer({ userRole, userDepartment, isAdm
 
   const handleVerify = async (userId: string) => {
     toast.promise(
-      fetch(`/api/users/verify/${userId}`, { method: 'POST' })
+      fetch(`/api/users/verify?id=${userId}`, { method: 'POST' })
         .then(res => {
           if (!res.ok) throw new Error('Failed to verify user');
           fetchUsers(); // Refresh the list
@@ -111,7 +111,7 @@ export default function UserVerificationViewer({ userRole, userDepartment, isAdm
 
   const handleUnverify = async (userId: string) => {
     toast.promise(
-      fetch(`/api/users/unverify/${userId}`, { method: 'POST' })
+      fetch(`/api/users/unverify?id=${userId}`, { method: 'POST' })
         .then(res => {
           if (!res.ok) throw new Error('Failed to unverify user');
           fetchUsers(); // Refresh the list
