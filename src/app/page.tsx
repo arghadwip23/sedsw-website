@@ -159,19 +159,6 @@ export default function Home() {
 
   return (
     <div className="w-full h-screen flex flex-col justify-center relative">
-      {/* Loading overlay */}
-      {isLoading && (
-        <div className="absolute inset-0 z-50 bg-black flex flex-col items-center justify-center">
-          <div className="w-64 h-1 bg-gray-700 rounded-full overflow-hidden mb-4">
-            <div
-              className="h-full bg-white transition-all duration-300 ease-out"
-              style={{ width: "100%" }}
-            ></div>
-          </div>
-          <p className="text-white text-lg">Loading Earth...</p>
-        </div>
-      )}
-
       {/* Earth 3D Model Background */}
       <div className="w-full h-screen fixed top-0 left-0 -z-[9999]">
         <Canvas camera={{ position: [0, 0, 3], fov: 45 }}>
