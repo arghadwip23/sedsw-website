@@ -174,24 +174,24 @@ export default function Events() {
                   className="snap-center flex-shrink-0"
                   style={{ minWidth: 320, maxWidth: 340 }}
                 ><Link href={`/events/${event._id}`}>
-                  <SpotlightCard
-                    className="custom-spotlight-card w-full rounded-xl"
-                    spotlightColor="rgba(255, 255, 255, 0.4)"
-                  >
-                    <div className="flex flex-col gap-2 p-4">
-                      <h2 className="text-white text-xl font-bold">{event.eventName}</h2>
-                      <div className="w-full h-px bg-white/20 my-2" />
-                      <p className="text-sm text-gray-300">
-                        <span>{event.location}</span>
-                      </p>
-                      <p className="text-sm text-gray-300">
-                        <span>{event.date}</span>
-                      </p>
-                      <p className="text-sm text-gray-300">
-                        <span className="font-semibold">{event.category}</span>
-                      </p>
-                    </div>
-                  </SpotlightCard>
+                    <SpotlightCard
+                      className="custom-spotlight-card w-full rounded-xl"
+                      spotlightColor="rgba(255, 255, 255, 0.4)"
+                    >
+                      <div className="flex flex-col gap-2 p-4">
+                        <h2 className="text-white text-xl font-bold">{event.eventName}</h2>
+                        <div className="w-full h-px bg-white/20 my-2" />
+                        <p className="text-sm text-gray-300">
+                          <span>{event.location}</span>
+                        </p>
+                        <p className="text-sm text-gray-300">
+                          <span>{event.date}</span>
+                        </p>
+                        <p className="text-sm text-gray-300">
+                          <span className="font-semibold">{event.category}</span>
+                        </p>
+                      </div>
+                    </SpotlightCard>
                   </Link>
                 </div>
               ))
@@ -240,8 +240,8 @@ export default function Events() {
       {/* Next Page Button */}
       <Link
         href="/team"
-        className="fixed bottom-8 right-8 z-30 px-6 py-3 bg-white text-black font-semibold shadow-lg transition-all duration-300 ease-out
-          hover:bg-black hover:text-white hover:scale-105 group flex items-center gap-2"
+        className="fixed bottom-8 right-8 z-30 px-6 py-3 backdrop-blur-xl text-white border-2 rounded-lg border-white/30 font-semibold shadow-lg transition-all duration-300 ease-out
+          hover:bg-white hover:text-black group flex items-center gap-2 active:scale-95"
       >
         <span>Next Page</span>
         <span className="transition-transform duration-300 group-hover:translate-x-1">&#8594;</span>

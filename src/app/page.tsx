@@ -15,8 +15,8 @@ function Stars({ count }: { count: number }) {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   const [starPositions, starColors] = useMemo(() => {
-    const positions: number[] = [];
-    const colors: number[] = [];
+    let positions = [];
+    let colors = [];
 
   for (let i = 0; i < count; i++) {
       const distance = 15 + Math.random() * 5; // Stars start farther away
@@ -25,7 +25,7 @@ function Stars({ count }: { count: number }) {
       const z = (Math.random() - 0.5) * distance;
       positions.push(x, y, z);
 
-  const color = new THREE.Color();
+      let color = new THREE.Color();
       const colorOptions = ["white", "lightyellow", "paleblue"];
       color.setStyle(
         colorOptions[Math.floor(Math.random() * colorOptions.length)]
@@ -159,19 +159,6 @@ export default function Home() {
 
   return (
     <div className="w-full h-screen flex flex-col justify-center relative">
-      {/* Loading overlay */}
-      {isLoading && (
-        <div className="absolute inset-0 z-50 bg-black flex flex-col items-center justify-center">
-          <div className="w-64 h-1 bg-gray-700 rounded-full overflow-hidden mb-4">
-            <div
-              className="h-full bg-white transition-all duration-300 ease-out"
-              style={{ width: "100%" }}
-            ></div>
-          </div>
-          <p className="text-white text-lg">Loading Earth...</p>
-        </div>
-      )}
-
       {/* Earth 3D Model Background */}
       <div className="w-full h-screen fixed top-0 left-0 -z-[9999]">
         <Canvas camera={{ position: [0, 0, 3], fov: 45 }}>
@@ -198,13 +185,13 @@ export default function Home() {
       >
         <div className="text-center relative">
           <span className="absolute -inset-2 rounded-3xl blur-md opacity-50 bg-black/50"></span>
-          <p className="text-white md:text-5xl text-3xl drop-shadow-lg relative px-4 py-2" style={{ textShadow: '160px 160px 2px rgba(0,0,0,0.8)' }}>Welcome to</p>
-          <h1 className="text-white md:text-9xl text-5xl font-extrabold drop-shadow-lg relative px-4 py-2" style={{ textShadow: '16px 16px 25px rgba(0,0,0,0.8)', letterSpacing: '1px' }}>SEDS ANTARIKSH</h1>
+          <p className="text-white md:text-5xl text-3xl drop-shadow-lg relative px-4 py-2" style={{ textShadow: '2px 2px 2px rgba(0,0,0,0.8)' }}>Welcome to</p>
+          <h1 className="text-white md:text-9xl text-5xl font-extrabold drop-shadow-lg relative px-4 py-2" style={{ textShadow: '2px 2px 2px rgba(0,0,0,0.8)', letterSpacing: '1px' }}>SEDS ANTARIKSH</h1>
         </div>
         <div className="mt-8 flex items-center justify-center">
           <Link
             href={"/about"}
-            className="group relative p-4 border-2 border-white/30 flex justify-center items-center backdrop-blur-xl rounded-2xl text-white transition-all duration-300 hover:px-6 hover:bg-white hover:text-black overflow-hidden w-40"
+            className="group relative p-4 border-2 border-white/30 flex justify-center items-center backdrop-blur-xl rounded-2xl active:scale-95 text-white transition-all duration-300 hover:px-6 hover:bg-white hover:text-black overflow-hidden w-40"
           >
             <div className="flex items-center justify-center relative w-full">
               <span className="transition-all duration-300 group-hover:translate-x-[-8px]">
