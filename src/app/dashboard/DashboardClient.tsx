@@ -14,16 +14,14 @@ interface DashboardClientProps {
   isAdmin: boolean;
   userRole: string;
   userDepartment: string;
-  registrationNumber: string;
   isCoreCommittee: boolean;
 }
 
-export default function DashboardClient({ 
-  isAdmin, 
-  userRole, 
+export default function DashboardClient({
+  isAdmin,
+  userRole,
   userDepartment,
-  registrationNumber 
-  , isCoreCommittee
+  isCoreCommittee,
 }: DashboardClientProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("profile");

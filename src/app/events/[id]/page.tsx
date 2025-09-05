@@ -1,7 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
 "use client"
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { MapPinIcon, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
 
 interface EventData {

@@ -1,6 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Loader2, RefreshCw, Check, X, UserCheck, User, Star, Shield } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -54,7 +55,7 @@ export default function UserVerificationViewer({ userRole, userDepartment, isAdm
     { value: 'false', label: 'Not Verified' },
   ];
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       // Build the query parameters
@@ -87,11 +88,11 @@ export default function UserVerificationViewer({ userRole, userDepartment, isAdm
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedDepartment, verificationFilter]);
 
   useEffect(() => {
     fetchUsers();
-  }, [selectedDepartment, verificationFilter]);
+  }, [fetchUsers]);
 
   const handleVerify = async (userId: string) => {
     toast.promise(
