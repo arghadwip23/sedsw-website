@@ -1,9 +1,8 @@
-// src/app/api/applications/approve/[id]/route.ts
+// src/app/api/applications/approve/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import PendingApplicationModel from "@/models/PendingApplicationModel";
 import User from "@/models/User";
-import { cookies } from "next/headers";
 import { decodeJwt } from "jose";
 
 interface JWTPayload {
@@ -15,62 +14,43 @@ interface JWTPayload {
   [key: string]: unknown;
 }
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: NextRequest) {
   try {
     await connectDB();
+    const body = await req.json();
+    const { token, applicationId } = body;
 
-    // Verify the user is authenticated and get their role
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
-
-    if (!token) {
+    if (!token || !applicationId) {
       return NextResponse.json(
-        { success: false, message: "Unauthorized: No token provided" },
-        { status: 401 }
+        { success: false, message: "Token and applicationId are required" },
+        { status: 400 }
       );
     }
 
     let userRole = "";
     let userDepartment = "";
-    let isAdmin = false;
+    let isCore = false;
 
     try {
       const decoded = decodeJwt<JWTPayload>(token);
       userRole = decoded.orgRole as string;
       userDepartment = decoded.department as string;
-      isAdmin = decoded.isAdmin === true;
+      isCore = decoded.isCoreCommittee === true;
     } catch (error) {
-      console.error("JWT decode error:", error);
       return NextResponse.json(
-        { success: false, message: "Unauthorized: Invalid token" },
+        { success: false, message: "Invalid token" },
         { status: 401 }
       );
     }
 
-    // Check if user has permission to approve applications
-    const payload: JWTPayload = decodeJwt<JWTPayload>(token);
-    const isCore = payload?.isCoreCommittee === true;
-
     if (!isCore) {
       return NextResponse.json(
-        {
-          success: false,
-          message:
-            "You don't have permission to approve applications. Only core committee members may approve.",
-        },
+        { success: false, message: "Only core committee members may approve applications." },
         { status: 403 }
       );
     }
 
-    // Get the application ID from the URL
-  const applicationId = params.id;
-
-    // Find the pending application
     const application = await PendingApplicationModel.findById(applicationId);
-
     if (!application) {
       return NextResponse.json(
         { success: false, message: "Application not found" },
@@ -78,21 +58,15 @@ export async function POST(
       );
     }
 
-    // If the core committee member is a department lead, enforce department match
     if (userRole === "lead" && application.primaryDepartment !== userDepartment) {
       return NextResponse.json(
-        {
-          success: false,
-          message:
-            "You can only approve applications for your department",
-        },
+        { success: false, message: "You can only approve applications for your department" },
         { status: 403 }
       );
     }
 
-    // Format phone number
     const formatPhoneNumber = (phone: string): string => {
-      const cleaned = phone.replace(/[^\d+\-\s()]/g, "");
+      const cleaned = phone.replace(/[^-\u007F]+/g, "");
       const digits = cleaned.replace(/\D/g, "");
       if (digits.length < 7) {
         return digits + "0".repeat(7 - digits.length);
@@ -100,7 +74,6 @@ export async function POST(
       return cleaned;
     };
 
-    // Create a new user
     const newUser = new User({
       name: application.fullName,
       registrationNumber: application.registrationNumber,
@@ -117,40 +90,18 @@ export async function POST(
     try {
       await newUser.save();
     } catch (saveError) {
-      console.error("Failed to save new user:", saveError);
       return NextResponse.json(
-        {
-          success: false,
-          message: "Failed to create user from application",
-          error: String(saveError),
-          userData: {
-            name: newUser.name,
-            email: newUser.email,
-            phoneNumber: newUser.phoneNumber,
-            department: newUser.department,
-          },
-        },
+        { success: false, message: "Failed to create user from application", error: String(saveError) },
         { status: 500 }
       );
     }
 
-    // Delete the pending application
     await PendingApplicationModel.findByIdAndDelete(applicationId);
 
-    // TODO: Send email notification
-
-    return NextResponse.json({
-      success: true,
-      message: "Application approved successfully",
-    });
+    return NextResponse.json({ success: true, message: "Application approved successfully" });
   } catch (error) {
-    console.error("Error approving application:", error);
     return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to approve application",
-        error: String(error),
-      },
+      { success: false, message: "Failed to approve application", error: String(error) },
       { status: 500 }
     );
   }

@@ -1,7 +1,21 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 import { Application } from "@/types/Application";
 
-export interface PendingApplicationDocument extends Document, Application {
+// Use Omit to avoid conflicting _id definitions between Mongoose's Document and our Application type.
+export interface PendingApplicationDocument extends Document {
+  // Mongoose document id
+  _id: mongoose.Types.ObjectId;
+
+  // Application fields (omit _id to avoid duplicate declaration)
+  fullName: Application["fullName"];
+  registrationNumber: Application["registrationNumber"];
+  email: Application["email"];
+  phone: Application["phone"];
+  primaryDepartment: Application["primaryDepartment"];
+  secondaryDepartment: Application["secondaryDepartment"];
+  motivation: Application["motivation"];
+
+  // Extra fields for pending applications
   verificationToken: string;
   createdAt: Date;
 }
