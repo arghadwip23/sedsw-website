@@ -151,7 +151,7 @@ export default function UserVerificationViewer({ userRole, userDepartment, isAdm
           User Verification
         </h2>
         
-        <div className="flex gap-4 items-center">
+        <div className="flex gap-4 items-center text-black">
           {canSelectDepartment && (
             <select
               value={selectedDepartment}
