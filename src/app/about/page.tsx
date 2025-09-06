@@ -1,83 +1,59 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, Suspense } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
-
-
-
-
-
-
-//import dynamic from "next/dynamic";
-
-// 🌕 Import your converted moon model
- import {Moon} from "@/components/Moon2"; // adjust path as needed
-//import { div } from "framer-motion/client";
-
+import { OrbitControls, useGLTF } from "@react-three/drei";
 import DecryptedText from "../../../TextAnimations/DecryptedText/DecryptedText";
 import BlurText from "../../../TextAnimations/BlurText/BlurText";
 
-
-// import { useRef, useState, useEffect } from "react";
-// import { useFrame } from "@react-three/fiber";
-// import { Moon } from "@/components/Moon2";
-// import * as THREE from "three";
-  function MoonScene() {
-  const ref = useRef<THREE.Group>(null);
-  const [lastMouse, setLastMouse] = useState<{ x: number; y: number } | null>(null);
-  const [mouseInfluence, setMouseInfluence] = useState({ x: 0, y: 0 });
+function MoonModel() {
+  const meshRef = useRef<THREE.Group>(null);
+  const { scene } = useGLTF("/models/moon.glb");
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (lastMouse) {
-        const deltaX = e.clientX - lastMouse.x;
-        const deltaY = e.clientY - lastMouse.y;
-
-        // Apply a small influence on rotation speed
-        setMouseInfluence({
-          x: deltaY * 0.001,
-          y: deltaX * 0.001,
-        });
-      }
-      setLastMouse({ x: e.clientX, y: e.clientY });
+    const handleMouseMove = (event: MouseEvent) => {
+      // Normalize mouse coordinates to -1 to 1 range
+      setMousePosition({
+        x: (event.clientX / window.innerWidth) * 2 - 1,
+        y: -(event.clientY / window.innerHeight) * 2 + 1,
+      });
     };
 
     window.addEventListener("mousemove", handleMouseMove);
+
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [lastMouse]);
+  }, []);
 
   useFrame(() => {
-    if (ref.current) {
-      // Base idle rotation
-      ref.current.rotation.y += 0.002;
-
-      // Add subtle mouse influence
-      ref.current.rotation.x += mouseInfluence.x;
-      ref.current.rotation.y += mouseInfluence.y;
-
-      // Slowly fade out mouse influence (like easing)
-      setMouseInfluence((prev) => ({
-        x: prev.x * 0.9,
-        y: prev.y * 0.9,
-      }));
+    if (meshRef.current) {
+      meshRef.current.rotation.y = THREE.MathUtils.lerp(
+        meshRef.current.rotation.y,
+        mousePosition.y * 0.2,
+        0.1
+      );
+      meshRef.current.rotation.x = THREE.MathUtils.lerp(
+        meshRef.current.rotation.x,
+        -mousePosition.x * 0.1 + Math.PI / 5,
+        0.1
+      );
     }
   });
 
   return (
-    <group ref={ref} position={[0, -3, 0]} scale={1.7}>
-      <Moon />
-    </group>
+    <primitive
+      ref={meshRef}
+      object={scene}
+      scale={60}
+      position={[70, 0, 0]}
+      rotation={[0, 0, 0]}
+    />
   );
 }
-
-
-
-
 
 export default function About() {
   const [isClient, setIsClient] = useState(false);
@@ -122,7 +98,7 @@ export default function About() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="group hover:scale-105 transition-all duration-300 backdrop-blur-sm bg-black/20 border border-white/10 rounded-xl p-6 w-full">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
@@ -134,7 +110,7 @@ export default function About() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="group hover:scale-105 transition-all duration-300 backdrop-blur-sm bg-black/20 border border-white/10 rounded-xl p-6 w-full">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
@@ -146,7 +122,7 @@ export default function About() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="group hover:scale-105 transition-all duration-300 backdrop-blur-sm bg-black/20 border border-white/10 rounded-xl p-6 w-full">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
@@ -165,21 +141,15 @@ export default function About() {
       <div className="w-full h-[50vh] lg:w-full lg:h-screen fixed bg-black bottom-0 lg:top-0 left-0 -z-[9]">
         {isClient && (
           <Canvas
-            camera={{ position: [0, 0, 5.3], fov: 45 }}
+            camera={{ position: [100, 100, 0], fov: 45 }}
             gl={{ powerPreference: "high-performance", antialias: true }}
             className="bg-black"
           >
-            <ambientLight intensity={0.5} />
-            <directionalLight intensity={5} position={[0, 10, -10]} />
-            <pointLight
-              position={[0, 10, -50]}
-              intensity={500}
-              color={"#fffbe0"}
-              distance={100}
-              decay={2}
-              castShadow
-            />
-            <MoonScene />
+            <ambientLight intensity={0.7} />
+            <directionalLight position={[5, 5, 5]} intensity={10} />
+            <Suspense fallback={null}>
+              <MoonModel />
+            </Suspense>
             <OrbitControls enableZoom={false} />
           </Canvas>
         )}
