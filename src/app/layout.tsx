@@ -5,6 +5,7 @@ import { Navbar } from "@/components/navbar";
 import SecondNav from "@/components/secondNav";
 // app/layout.tsx
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
 
 
@@ -62,12 +63,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-     
+
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black`}
       >
-         
-       {/* Mobile Navbar */}
+
+        {/* Mobile Navbar */}
         <div className="fixed top-0 left-0 w-full z-[4000] flex lg:hidden">
           <Navbar />
         </div>
@@ -78,8 +79,9 @@ export default function RootLayout({
         </div>
 
         {/* Page Content with padding to avoid overlap */}
-        <main className="pt-20"> 
+        <main className="pt-20">
           {children}
+          <Analytics />
         </main>
         {/* {children} */}
       </body>
