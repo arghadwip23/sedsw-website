@@ -111,179 +111,93 @@ const Join = () => {
   const [showForm, setShowForm] = useState(false);
   const [showThankYou, setShowThankYou] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [verificationSent, setVerificationSent] = useState(false);
-  const [verificationError, setVerificationError] = useState("");
+  const [emailError, setEmailError] = useState("");
 
   // Check URL parameters on component mount and when URL changes
-  useEffect(() => {
-    const checkUrlParams = () => {
-      if (typeof window !== 'undefined') {
-        const urlParams = new URLSearchParams(window.location.search);
-        const verified = urlParams.get('verified');
-        const error = urlParams.get('error');
 
-        console.log("URL params - verified:", verified, "error:", error);
-        console.log("Current URL:", window.location.href);
 
-        if (verified === '1') {
-          console.log("Setting showThankYou to true");
-          setShowThankYou(true);
-          // Clear the URL parameters
-          window.history.replaceState({}, document.title, window.location.pathname);
-        } else if (verified === '0' && error) {
-          // Handle verification errors
-          let errorMsg = "Verification failed. ";
-          switch (error) {
-            case 'no_token':
-              errorMsg += "No verification token provided.";
-              break;
-            case 'invalid_token':
-              errorMsg += "Invalid or expired verification token.";
-              break;
-            case 'duplicate':
-              errorMsg += "Registration number already exists.";
-              break;
-            case 'server_error':
-              errorMsg += "Server error occurred during verification.";
-              break;
-            default:
-              errorMsg += "Unknown error occurred.";
-          }
-          setVerificationError(errorMsg);
-          console.error(errorMsg);
-        }
-      }
-    };
-
-    // Check on mount
-    checkUrlParams();
-
-    // Listen for URL changes (for when verification redirects back)
-    const handleUrlChange = () => {
-      console.log("URL changed, checking params again");
-      checkUrlParams();
-    };
-
-    // Listen for popstate (back/forward navigation)
-    window.addEventListener('popstate', handleUrlChange);
-
-    // Also check when the component is focused (in case verification opened in new tab)
-    const handleFocus = () => {
-      console.log("Window focused, checking params");
-      checkUrlParams();
-      // Also check cross-tab signal via localStorage flag
-      try {
-        if (localStorage.getItem('seds_verified') === '1') {
-          setShowThankYou(true);
-          localStorage.removeItem('seds_verified');
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    };
-
-    window.addEventListener('focus', handleFocus);
-
-    // Listen via BroadcastChannel for cross-tab verification
-    let bc: BroadcastChannel | null = null;
-    try {
-      if ('BroadcastChannel' in window) {
-        bc = new BroadcastChannel('seds_verification');
-        bc.onmessage = (ev) => {
-          if (ev?.data?.verified) {
-            setShowThankYou(true);
-          }
-        };
-      }
-    } catch {
-      // Ignore BroadcastChannel errors
-    }
-
-    // Listen to storage events (in case BroadcastChannel is unavailable)
-    const onStorage = (ev: StorageEvent) => {
-      if (ev.key === 'seds_verified' && ev.newValue === '1') {
-        setShowThankYou(true);
-        try { localStorage.removeItem('seds_verified'); } catch {
-          // Ignore localStorage errors
-        }
-      }
-    };
-    window.addEventListener('storage', onStorage);
-
-    return () => {
-      window.removeEventListener('popstate', handleUrlChange);
-      window.removeEventListener('focus', handleFocus);
-      window.removeEventListener('storage', onStorage);
-      if (bc) {
-        try { bc.close(); } catch {
-          // Ignore close errors
-        }
-      }
-    };
-  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => {
+      const updated = { ...prev, [name]: value };
+      // Department error: show immediately if both are same
+      if (
+        (name === "primaryDepartment" && value === prev.secondaryDepartment && value !== "") ||
+        (name === "secondaryDepartment" && value === prev.primaryDepartment && value !== "")
+      ) {
+        setDeptError("Primary and secondary department preferences must be different.");
+      } else if (name === "primaryDepartment" || name === "secondaryDepartment") {
+        setDeptError("");
+      }
+      // Email error: only show if not empty
+      if (name === "email") {
+        if (value === "") {
+          setEmailError("");
+        } else if (!value.endsWith("@vitstudent.ac.in")) {
+          setEmailError("Please use VIT Email address");
+        } else {
+          setEmailError("");
+        }
+      }
+      return updated;
+    });
   };
 
   const handleBackToMain = () => {
     setShowForm(false);
-    setVerificationSent(false);
-    setVerificationError("");
     setFormData(initialFormData);
   };
 
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setLoading(true);
-    // Clear previous banners so only the latest shows
-    setVerificationSent(false);
-    setVerificationError("");
     setErrorMessage("");
     setDeptError("");
     setRegError("");
+    setEmailError("");
+
+    if (!formData.email.endsWith("@vitstudent.ac.in")) {
+      setEmailError("Please use VIT Email address");
+      setLoading(false);
+      return;
+    }
 
     if (formData.primaryDepartment === formData.secondaryDepartment) {
       setDeptError("Primary and secondary department preferences must be different.");
-      setVerificationSent(false);
       setLoading(false);
       return;
     }
 
     try {
-      console.log("Submitting form data:", formData);
       const res = await fetch("/api/applications", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
-      console.log("Response status:", res.status);
       const data = await res.json();
-      console.log("Response data:", data);
-
       if (res.ok) {
         setErrorMessage("");
-        setVerificationError("");
         setDeptError("");
         setRegError("");
-        setFormData(initialFormData); // reset form
+        setEmailError("");
+        setFormData(initialFormData);
         setShowThankYou(true);
       } else {
-        setVerificationSent(false);
-        if (res.status === 400 && data.message && data.message.toLowerCase().includes('registration number already exists')) {
-          // Show inline under registration number instead of top banner
-          setRegError("Registration number already registered");
+        if (res.status === 400 && data.message) {
+          if (data.message.toLowerCase().includes("registration number already exists")) {
+            setRegError("Registration number already registered");
+          } else if (data.message.toLowerCase().includes("email already exists")) {
+            setEmailError("Email already registered");
+          } else {
+            setErrorMessage(`❌ Failed: ${data.message}`);
+          }
         } else {
-          setErrorMessage(`❌ Failed: ${data.message || "Something went wrong"}`);
+          setErrorMessage("❌ Failed: " + (data.message || "Something went wrong"));
         }
       }
     } catch (error) {
-      console.error("Application submission error:", error);
-      setVerificationSent(false);
       setErrorMessage("❌ Network error. Please try again later.");
     } finally {
       setLoading(false);
@@ -331,37 +245,39 @@ const Join = () => {
 
   if (showThankYou) {
     return (
-      <div className="relative w-full h-screen bg-transparent backdrop-blur-lg flex items-center justify-center">
+      <div className="relative w-full h-screen bg-transparent flex items-center justify-center">
         <GalaxyBackground />
-        <div className="flex flex-col items-center justify-center text-center px-6 -mt-25">
-          <BlurText
-            text="Thank You!"
-            delay={10}
-            animateBy="words"
-            direction="top"
-            className="text-6xl font-bold text-white mb-8"
-          />
-          <BlurText
-            text="Your application has been submitted successfully!"
-            delay={50}
-            animateBy="words"
-            direction="top"
-            className="text-xl text-white/90 max-w-2xl mb-12"
-          />
-          <BlurText
-            text="Our team will reach out to you during our recruitment season."
-            delay={50}
-            animateBy="words"
-            direction="top"
-            className="text-xl text-white/90 max-w-2xl mb-12 -mt-12"
-          />
-          <div className="flex flex-col md:flex-row gap-4">
-            <button
-              onClick={() => window.location.href = '/'}
-              className="h-14 border border-white bg-white text-black font-semibold text-lg transition-all duration-300 ease-in-out hover:bg-black hover:text-white hover:scale-105 active:scale-95 px-8"
-            >
-              Back to Home
-            </button>
+        <div className="absolute inset-0 flex items-center justify-center z-10">
+          <div className="backdrop-blur-2xl bg-black/2 rounded-3xl shadow-2xl px-8 py-12 flex flex-col items-center max-w-2xl w-full mx-4">
+            <BlurText
+              text="Thank You!"
+              delay={10}
+              animateBy="words"
+              direction="top"
+              className="text-6xl font-bold text-white mb-8"
+            />
+            <BlurText
+              text="Your application has been submitted successfully!"
+              delay={50}
+              animateBy="words"
+              direction="top"
+              className="text-xl text-white/90 max-w-2xl mb-12"
+            />
+            <BlurText
+              text="Our team will reach out to you during our recruitment season."
+              delay={50}
+              animateBy="words"
+              direction="top"
+              className="text-xl text-white/90 max-w-2xl mb-12 -mt-12"
+            />
+            <div className="flex flex-col md:flex-row gap-4">
+              <button
+                onClick={() => window.location.href = '/'}
+                className="h-14 border border-white bg-white text-black font-semibold text-lg transition-all duration-300 ease-in-out hover:bg-black hover:text-white hover:scale-105 active:scale-95 px-8"
+              >
+                Back to Home
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -376,7 +292,7 @@ const Join = () => {
       {!showForm ? (
         <div className="relative z-10 flex flex-col items-center justify-center h-full w-full px-6 md:px-16">
           <div className="max-w-4xl w-full text-center">
-            <div className="backdrop-blur-xl bg-transparent rounded-3xl p-8 md:p-12 mb-12">
+            <div className="backdrop-blur-xl bg-transparent rounded-3xl p-8 md:p-12 mb-32">
               <BlurText
                 text="Join Us"
                 delay={150}
@@ -548,7 +464,7 @@ const Join = () => {
         <div className="relative z-10 w-full h-full flex items-center justify-center px-6 -mt-10">
           <div className="w-full max-w-4xl">
             {/* Back Button above the form */}
-            <div className="flex justify-start pt-24 pb-0">
+            <div className="flex justify-start pt-35 pb-0">
               <button
                 onClick={handleBackToMain}
                 className="flex items-center text-white hover:text-gray-300 transition-colors"
@@ -567,18 +483,6 @@ const Join = () => {
               </button>
             </div>
             <div className="pt-4">
-              {verificationSent && (
-                <div className="mb-4 text-green-400 text-center font-medium p-4 bg-green-500/20 border border-green-500/50 rounded-md">
-                  ✅ Thank You
-
-                </div>
-              )}
-
-              {verificationError && (
-                <div className="mb-4 text-red-400 text-center font-medium p-4 bg-red-500/20 border border-red-500/50 rounded-md">
-                  ❌ {verificationError}
-                </div>
-              )}
 
               {errorMessage && (
                 <div className="mb-4 text-red-400 text-center font-medium p-4 bg-red-500/20 border border-red-500/50 rounded-md">
@@ -626,6 +530,7 @@ const Join = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
                   <div>
                     <label className="block text-white text-sm font-medium mb-2">Email Address *</label>
                     <input
@@ -637,6 +542,11 @@ const Join = () => {
                       className="w-full p-3 bg-black/40 border border-white/30 text-white rounded-md focus:outline-none focus:border-white/60 transition-colors"
                       placeholder="Enter your email address"
                     />
+                    {emailError && (
+                      <p style={{ color: "red", fontSize: "0.9rem", marginTop: "4px" }}>
+                        {emailError}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-white text-sm font-medium mb-2">Phone Number *</label>
