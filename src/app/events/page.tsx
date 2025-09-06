@@ -1,8 +1,12 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import Link from "next/link";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, Suspense, useMemo } from "react";
 import SpotlightCard from "../../../Components/SpotlightCard/SpotlightCard";
+import * as THREE from "three";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { OrbitControls, useGLTF } from "@react-three/drei";
 
 interface Event {
   _id: string;
@@ -13,14 +17,152 @@ interface Event {
   thumbnail?: string;
 }
 
+function Stars({ count }: { count: number }) {
+  const starGeometry = useRef<THREE.BufferGeometry>(null);
+  const starMaterial = useRef<THREE.PointsMaterial>(null);
+  const stars = useRef<THREE.Points>(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  const [starPositions, starColors] = useMemo(() => {
+    const positions = [];
+    const colors = [];
+    const marsPosition = [70, 0, 30]; // Match Mars model position
+    const radius = 200; // Larger radius to encompass Mars
+
+    for (let i = 0; i < count; i++) {
+      // Use spherical distribution
+      const u = Math.random();
+      const v = Math.random();
+      const theta = 2 * Math.PI * u;
+      const phi = Math.acos(2 * v - 1);
+
+      // Convert spherical to cartesian coordinates
+      const x = radius * Math.sin(phi) * Math.cos(theta) + marsPosition[0];
+      const y = radius * Math.sin(phi) * Math.sin(theta) + marsPosition[1];
+      const z = radius * Math.cos(phi) + marsPosition[2];
+
+      positions.push(x, y, z);
+
+      const color = new THREE.Color();
+      color.setStyle("white"); // Stick to white stars for better visibility
+      colors.push(color.r, color.g, color.b);
+    }
+
+    return [new Float32Array(positions), new Float32Array(colors)];
+  }, [count]);
+
+  useEffect(() => {
+    if (!starGeometry.current) {
+      starGeometry.current = new THREE.BufferGeometry();
+    }
+
+    starGeometry.current.setAttribute(
+      "position",
+      new THREE.BufferAttribute(starPositions, 3)
+    );
+    starGeometry.current.setAttribute(
+      "color",
+      new THREE.BufferAttribute(starColors, 3)
+    );
+
+    if (!starMaterial.current) {
+      starMaterial.current = new THREE.PointsMaterial({
+        size: 1,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.8,
+      });
+    }
+
+    if (!stars.current) {
+      stars.current = new THREE.Points(
+        starGeometry.current,
+        starMaterial.current
+      );
+    }
+
+    const handleMouseMove = (event: MouseEvent) => {
+      setMousePosition({
+        x: (event.clientX / window.innerWidth) * 2 - 1,
+        y: -(event.clientY / window.innerHeight) * 2 + 1,
+      });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [starColors, starPositions]);
+
+  useFrame(() => {
+    if (stars.current) {
+      // Match Mars rotation pattern
+      stars.current.rotation.y = THREE.MathUtils.lerp(
+        stars.current.rotation.y,
+        mousePosition.y * 0.2,
+        0.1
+      );
+      stars.current.rotation.x = THREE.MathUtils.lerp(
+        stars.current.rotation.x,
+        -mousePosition.x * 0.1 + Math.PI / 2,
+        0.1
+      );
+    }
+  });
+
+  return stars.current ? <primitive object={stars.current} /> : null;
+}
+
+function MoonModel() {
+  const meshRef = useRef<THREE.Group>(null);
+  const { scene } = useGLTF("/models/mars.glb");
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      setMousePosition({
+        x: (event.clientX / window.innerWidth) * 2 - 1,
+        y: -(event.clientY / window.innerHeight) * 2 + 1,
+      });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
+  useFrame(() => {
+    if (meshRef.current) {
+      meshRef.current.rotation.y = THREE.MathUtils.lerp(
+        meshRef.current.rotation.y,
+        mousePosition.y * 0.2 + Math.PI / 3,
+        0.1
+      );
+      meshRef.current.rotation.x = THREE.MathUtils.lerp(
+        meshRef.current.rotation.x,
+        -mousePosition.x * 0.1 + Math.PI / 3,
+        0.1
+      );
+    }
+  });
+
+  return (
+    <primitive
+      ref={meshRef}
+      object={scene}
+      scale={60}
+      position={[70, 0, 30]}
+      rotation={[0, 0, 0]}
+    />
+  );
+}
+
 export default function Events() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [progress, setProgress] = useState(0);
   const [events, setEvents] = useState<Event[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isClient, setIsClient] = useState(false);
 
-  // Fetch events from backend
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -36,41 +178,6 @@ export default function Events() {
     fetchEvents();
   }, []);
 
-  // Loader for video progress
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const handleProgress = () => {
-      if (video.buffered.length > 0) {
-        const bufferedEnd = video.buffered.end(video.buffered.length - 1);
-        const duration = video.duration;
-        if (duration > 0) {
-          setProgress(Math.round((bufferedEnd / duration) * 100));
-        }
-      }
-    };
-
-    const handleCanPlay = () => {
-      setTimeout(() => setIsLoading(false), 500);
-    };
-
-    video.addEventListener("progress", handleProgress);
-    video.addEventListener("canplay", handleCanPlay);
-    video.addEventListener("loadeddata", handleCanPlay);
-
-    if (video.readyState >= 3) {
-      handleCanPlay();
-    }
-
-    return () => {
-      video.removeEventListener("progress", handleProgress);
-      video.removeEventListener("canplay", handleCanPlay);
-      video.removeEventListener("loadeddata", handleCanPlay);
-    };
-  }, []);
-
-  // Scroll behavior
   const scrollByCards = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
     const cardWidth = scrollRef.current.firstElementChild?.clientWidth || 300;
@@ -119,39 +226,30 @@ export default function Events() {
     return () => {
       if (ref) ref.removeEventListener("scroll", handleScroll);
     };
-  }, [isLoading]);
+  }, []);
 
   return (
     <div className="w-full h-screen flex flex-col justify-center relative">
-      {/* Loading overlay */}
-      {isLoading && (
-        <div className="absolute inset-0 z-50 bg-black flex flex-col items-center justify-center">
-          <div className="w-64 h-1 bg-gray-700 rounded-full overflow-hidden mb-4">
-            <div
-              className="h-full bg-white transition-all duration-300 ease-out"
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
-          <p className="text-white text-lg">Loading...</p>
-          <p className="text-gray-400 text-sm mt-2">
-            {progress}%
-          </p>
-        </div>
-      )}
-
-      {/* Mars Video Background */}
-      <div className="w-full h-screen fixed top-0 left-0 -z-[9999]">
-        <video
-          ref={videoRef}
-          src="/videos/mars.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full h-full object-cover"
-        />
+      {/* 3D Moon + Stars Background */}
+      <div className="w-full h-screen fixed top-0 left-0 -z-[9999] bg-black">
+        {isClient && (
+          <Canvas
+            camera={{ position: [100, 100, 0], fov: 45 }}
+            gl={{ powerPreference: "high-performance", antialias: true }}
+            className="absolute inset-0"
+          >
+            <ambientLight intensity={0} />
+            <directionalLight position={[50, 100, 50]} intensity={3} />
+            <Suspense fallback={null}>
+              <MoonModel />
+              <Stars count={500} />
+            </Suspense>
+            <OrbitControls enableZoom={false} />
+          </Canvas>
+        )}
       </div>
 
+      {/* Events Section */}
       <div className="flex flex-col z-2 -mt-30">
         <h1 className="text-3xl font-bold text-white md:mb-16 md:pr-36 md:text-left md:pl-24 text-center mb-8">
           Our Events
@@ -165,7 +263,10 @@ export default function Events() {
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
           >
-            <div style={{ minWidth: 24, maxWidth: 24, pointerEvents: "none" }} aria-hidden="true" />
+            <div
+              style={{ minWidth: 24, maxWidth: 24, pointerEvents: "none" }}
+              aria-hidden="true"
+            />
 
             {events.length > 0 ? (
               events.map((event) => (
@@ -173,13 +274,16 @@ export default function Events() {
                   key={event._id}
                   className="snap-center flex-shrink-0"
                   style={{ minWidth: 320, maxWidth: 340 }}
-                ><Link href={`/events/${event._id}`}>
+                >
+                  <Link href={`/events/${event._id}`}>
                     <SpotlightCard
                       className="custom-spotlight-card w-full rounded-xl"
                       spotlightColor="rgba(255, 255, 255, 0.4)"
                     >
                       <div className="flex flex-col gap-2 p-4">
-                        <h2 className="text-white text-xl font-bold">{event.eventName}</h2>
+                        <h2 className="text-white text-xl font-bold">
+                          {event.eventName}
+                        </h2>
                         <div className="w-full h-px bg-white/20 my-2" />
                         <p className="text-sm text-gray-300">
                           <span>{event.location}</span>
@@ -188,7 +292,9 @@ export default function Events() {
                           <span>{event.date}</span>
                         </p>
                         <p className="text-sm text-gray-300">
-                          <span className="font-semibold">{event.category}</span>
+                          <span className="font-semibold">
+                            {event.category}
+                          </span>
                         </p>
                       </div>
                     </SpotlightCard>
@@ -199,15 +305,22 @@ export default function Events() {
               <p className="text-white">No events available</p>
             )}
 
-            <div style={{ minWidth: 24, maxWidth: 24, pointerEvents: "none" }} aria-hidden="true" />
+            <div
+              style={{ minWidth: 24, maxWidth: 24, pointerEvents: "none" }}
+              aria-hidden="true"
+            />
           </div>
           {/* Thin scroll indicator */}
           <div className="absolute left-1/4 right-1/4 bottom-14 h-1 bg-white/10 rounded-full pointer-events-none overflow-hidden">
             <div
               className="h-full bg-white/40 rounded-full transition-all duration-200 absolute"
               style={{
-                width: `${(scrollIndicator.width / (scrollRef.current?.clientWidth || 1)) * 100}%`,
-                left: `${(scrollIndicator.left / (scrollRef.current?.clientWidth || 1)) * 100}%`,
+                width: `${(scrollIndicator.width / (scrollRef.current?.clientWidth || 1)) *
+                  100
+                  }%`,
+                left: `${(scrollIndicator.left / (scrollRef.current?.clientWidth || 1)) *
+                  100
+                  }%`,
               }}
             />
           </div>
@@ -215,10 +328,12 @@ export default function Events() {
             <button
               aria-label="Scroll left"
               className={`p-2 transition
-                ${canScrollLeft ? "transparent text-white hover:bg-white hover:text-black" : "text-gray-400 cursor-not-allowed"}
+                ${canScrollLeft
+                  ? "transparent text-white hover:bg-white hover:text-black"
+                  : "text-gray-400 cursor-not-allowed"
+                }
               `}
               onClick={() => scrollByCards("left")}
-              style={{ pointerEvents: canScrollLeft && !isLoading ? "auto" : "none" }}
               disabled={!canScrollLeft}
             >
               &#8592;
@@ -226,10 +341,12 @@ export default function Events() {
             <button
               aria-label="Scroll right"
               className={`p-2 transition
-                ${canScrollRight ? "transparent text-white hover:bg-white hover:text-black" : " text-gray-400 cursor-not-allowed"}
+                ${canScrollRight
+                  ? "transparent text-white hover:bg-white hover:text-black"
+                  : " text-gray-400 cursor-not-allowed"
+                }
               `}
               onClick={() => scrollByCards("right")}
-              style={{ pointerEvents: canScrollRight && !isLoading ? "auto" : "none" }}
               disabled={!canScrollRight}
             >
               &#8594;
@@ -237,6 +354,7 @@ export default function Events() {
           </div>
         </div>
       </div>
+
       {/* Next Page Button */}
       <Link
         href="/team"
@@ -244,7 +362,9 @@ export default function Events() {
           hover:bg-white hover:text-black group flex items-center gap-2 active:scale-95"
       >
         <span>Next Page</span>
-        <span className="transition-transform duration-300 group-hover:translate-x-1">&#8594;</span>
+        <span className="transition-transform duration-300 group-hover:translate-x-1">
+          &#8594;
+        </span>
       </Link>
     </div>
   );
