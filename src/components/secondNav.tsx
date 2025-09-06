@@ -1,22 +1,52 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 export default function SecondNav() {
   const pathname = usePathname();
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(pathname === '/');
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleVisibility = useCallback((shouldShow: boolean) => {
+    // Clear any existing timeout
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+
+    if (shouldShow) {
+      setIsVisible(true);
+    } else {
+      // Set a new timeout to hide the navbar after 2 seconds
+      hideTimeoutRef.current = setTimeout(() => {
+        setIsVisible(false);
+      }, 300);
+    }
+  }, []);
 
   useEffect(() => {
+    // Always show on homepage
+    if (pathname === '/') {
+      setIsVisible(true);
+      return;
+    }
+
     const handleMouseMove = (e: MouseEvent) => {
-      setIsVisible(e.clientY <= 100);
+      handleVisibility(e.clientY <= 100);
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      // Clear timeout on cleanup
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+      }
+    };
+  }, [pathname, handleVisibility]);
 
   type Navlink = {
     label: string;
