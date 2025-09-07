@@ -23,7 +23,7 @@ export default function SecondNav() {
       // Set a new timeout to hide the navbar after 2 seconds
       hideTimeoutRef.current = setTimeout(() => {
         setIsVisible(false);
-      }, 300);
+      }, 250);
     }
   }, []);
 
@@ -70,7 +70,9 @@ export default function SecondNav() {
         bg-black/10 backdrop-blur-xl rounded-2xl z-[4000] transition-all duration-300
         ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full'}`}
     >
-      <Image src={`/logo.svg`} width={45} height={45} alt="logo" />
+      <Link href="/">
+        <Image src={`/logo.svg`} width={45} height={45} alt="logo" className="hover:opacity-80 transition-opacity" />
+      </Link>
       <div>
         <ul className='flex gap-7 font-semibold'>
           {elements.map((element, index) => (
