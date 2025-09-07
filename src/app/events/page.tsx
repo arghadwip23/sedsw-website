@@ -132,12 +132,12 @@ function MoonModel() {
     if (meshRef.current) {
       meshRef.current.rotation.y = THREE.MathUtils.lerp(
         meshRef.current.rotation.y,
-        mousePosition.y * 0.2 + Math.PI / 3,
+        mousePosition.y * 0.2 + Math.PI / 6,
         0.1
       );
       meshRef.current.rotation.x = THREE.MathUtils.lerp(
         meshRef.current.rotation.x,
-        -mousePosition.x * 0.1 + Math.PI / 3,
+        -mousePosition.x * 0.1 + Math.PI / 2,
         0.1
       );
     }
@@ -238,8 +238,8 @@ export default function Events() {
             gl={{ powerPreference: "high-performance", antialias: true }}
             className="absolute inset-0"
           >
-            <ambientLight intensity={0} />
-            <directionalLight position={[50, 100, 50]} intensity={3} />
+            <ambientLight intensity={0.5} />
+            <directionalLight position={[-1000, 200, 150]} intensity={10} />
             <Suspense fallback={null}>
               <MoonModel />
               <Stars count={500} />
