@@ -46,6 +46,14 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  icons: {
+    icon: [
+      { url: '/logo.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico' }, // Fallback for browsers that don't support SVG
+    ],
+    shortcut: '/logo.svg',
+    apple: '/logo.svg',
+  },
 };
 
 
