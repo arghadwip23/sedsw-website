@@ -276,10 +276,10 @@ const SpaceTeamPage = () => {
                             <Mail className="w-3 h-3" />
                             <span className="truncate">{member.email}</span>
                           </div>
-                          <div className="flex items-center justify-center space-x-2 text-xs text-gray-500">
+                          {/* <div className="flex items-center justify-center space-x-2 text-xs text-gray-500">
                             <Phone className="w-3 h-3" />
                             <span>{member.phoneNumber}</span>
-                          </div>
+                          </div> */}
                         </div>
 
                         {/* Admin Badge */}

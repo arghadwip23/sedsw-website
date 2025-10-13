@@ -64,7 +64,7 @@ export default function About() {
 
   return (
     <div className="w-full h-screen flex items-start  pt-0 relative">
-      <div className="absolute top-4 md:top-32 md:pb-0 left-0 w-full flex flex-col slef-start items-center  z-10">
+      <div className="absolute top-4 md:top-16 md:pb-0 left-0 w-full flex flex-col slef-start items-center  z-10">
         <div className="backdrop-blur-lg border border-white/10 bg-black/20 rounded-3xl shadow-2xl px-8 py-12 max-w-6xl mx-auto flex flex-col lg:flex-row gap-16 items-center">
           <div className="flex-1 min-w-[300px]">
             <DecryptedText
